@@ -13,74 +13,59 @@ interface Props {
 
 export default function SubdomainCard({ subdomain, onEdit, onDelete, onViewAnalytics }: Props) {
   return (
-    <div
-      className={styles.subdomainCard}
-      data-active={subdomain.isActive}
-      onClick={() => onViewAnalytics(subdomain.subdomain)}
-    >
-      <div className={styles.cardHeader}>
-        <div className={styles.cardTitle}>
-          <h3>{subdomain.title}</h3>
-          <div className={styles.statusBadge} data-active={subdomain.isActive}>
-            {subdomain.isActive ? (
-              <><CheckCircle size={14} /> Active</>
-            ) : (
-              <><XCircle size={14} /> Inactive</>
-            )}
+    <div className={styles.subdomainCard}>
+      <div className={styles.cardContent}>
+        {/* Left: Title and URL */}
+        <div className={styles.cardInfo}>
+          <div className={styles.cardTitleRow}>
+            <h3 className={styles.cardTitle}>{subdomain.title}</h3>
+            <span className={styles.statusDot} data-active={subdomain.isActive} />
           </div>
+          <a
+            href={`http://${subdomain.subdomain}.${ROOT_DOMAIN}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.cardUrl}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {subdomain.subdomain}.{ROOT_DOMAIN}
+            <ExternalLink size={12} />
+          </a>
+          {subdomain.description && (
+            <p className={styles.cardDesc}>{subdomain.description}</p>
+          )}
         </div>
+
+        {/* Right: Actions */}
         <div className={styles.cardActions}>
+          <button
+            onClick={() => onViewAnalytics(subdomain.subdomain)}
+            className={styles.actionBtn}
+          >
+            <BarChart3 size={14} />
+          </button>
           <button
             onClick={(e) => {
               e.stopPropagation();
               onEdit(subdomain);
             }}
-            className={styles.iconButton}
+            className={styles.actionBtn}
             title="Edit"
           >
-            <Edit2 size={16} />
+            <Edit2 size={14} />
           </button>
           <button
             onClick={(e) => {
               e.stopPropagation();
               onDelete(subdomain.subdomain, subdomain.title);
             }}
-            className={styles.iconButtonDanger}
+            className={styles.actionBtnDanger}
             title="Delete"
           >
-            <Trash2 size={16} />
+            <Trash2 size={14} />
           </button>
         </div>
-      </div>
-
-      <div className={styles.subdomainUrl}>
-        <code>{subdomain.subdomain}.{ROOT_DOMAIN}</code>
-        <a
-          href={`http://${subdomain.subdomain}.${ROOT_DOMAIN}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={(e) => e.stopPropagation()}
-          title="Open subdomain"
-        >
-          <ExternalLink size={14} />
-        </a>
-      </div>
-
-      <p className={styles.description}>{subdomain.description || 'No description'}</p>
-
-      <div className={styles.cardFooter}>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onViewAnalytics(subdomain.subdomain);
-          }}
-          className={styles.analyticsButton}
-        >
-          <BarChart3 size={14} />
-          <span>View Analytics</span>
-        </button>
       </div>
     </div>
   );
 }
-
