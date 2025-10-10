@@ -39,23 +39,24 @@ export default function SubdomainForm({
     <div className={styles.modal} onClick={onClose}>
       <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modalHeader}>
-          <h3>{editingSubdomain ? 'Edit Subdomain' : 'Create New Subdomain'}</h3>
-          <button onClick={onClose} className={styles.closeButton}>
-            <X size={20} />
+          <h2>{editingSubdomain ? 'Edit Subdomain' : 'Create New Subdomain'}</h2>
+          <button onClick={onClose} className={styles.closeButton} aria-label="Close">
+            <X size={18} />
           </button>
         </div>
 
-        {error && (
-          <div className={styles.error}>
-            <X size={16} />
-            <span>{error}</span>
-          </div>
-        )}
+        <form onSubmit={handleSubmit} className={styles.modalForm}>
+          {error && (
+            <div className={styles.errorAlert}>
+              <X size={16} />
+              <span>{error}</span>
+            </div>
+          )}
 
-        <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.formGroup}>
-            <label>Subdomain *</label>
+            <label htmlFor="subdomain">Subdomain *</label>
             <input
+              id="subdomain"
               type="text"
               placeholder="mysite"
               value={formData.subdomain}
@@ -63,53 +64,62 @@ export default function SubdomainForm({
                 setFormData({ ...formData, subdomain: e.target.value.toLowerCase() })
               }
               disabled={!!editingSubdomain}
+              className={styles.input}
               required
             />
-            <small>Only lowercase letters, numbers, and hyphens</small>
+            <span className={styles.hint}>Only lowercase letters, numbers, and hyphens</span>
           </div>
 
           <div className={styles.formGroup}>
-            <label>Title *</label>
+            <label htmlFor="title">Title *</label>
             <input
+              id="title"
               type="text"
               placeholder="My Awesome Site"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              className={styles.input}
               required
             />
           </div>
 
           <div className={styles.formGroup}>
-            <label>Description</label>
+            <label htmlFor="description">Description</label>
             <input
+              id="description"
               type="text"
               placeholder="A brief description of your subdomain"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              className={styles.input}
             />
           </div>
 
           <div className={styles.formGroup}>
-            <label>Content (HTML)</label>
+            <label htmlFor="content">Content (HTML)</label>
             <textarea
+              id="content"
               placeholder="<h1>Welcome!</h1><p>Your content here...</p>"
               value={formData.content}
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
               rows={10}
+              className={styles.textarea}
             />
           </div>
 
           <div className={styles.formGroup}>
-            <label>Custom CSS (Optional)</label>
+            <label htmlFor="customCss">Custom CSS (Optional)</label>
             <textarea
+              id="customCss"
               placeholder="body { background: #f0f0f0; }"
               value={formData.customCss}
               onChange={(e) => setFormData({ ...formData, customCss: e.target.value })}
               rows={6}
+              className={styles.textarea}
             />
           </div>
 
-          <div className={styles.formActions}>
+          <div className={styles.modalActions}>
             <button type="button" onClick={onClose} className={styles.cancelButton}>
               Cancel
             </button>
