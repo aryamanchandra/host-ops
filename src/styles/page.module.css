@@ -1907,3 +1907,142 @@
   border-color: #dc2626;
   color: #f87171;
 }
+
+/* Subdomain Card */
+.subdomainCard {
+  background: white;
+  border: 1px solid #eaeaea;
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.subdomainCard:hover {
+  border-color: #000;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  transform: translateY(-2px);
+}
+
+[data-theme="dark"] .subdomainCard {
+  background: #111;
+  border-color: #333;
+}
+
+[data-theme="dark"] .subdomainCard:hover {
+  border-color: #666;
+  box-shadow: 0 4px 16px rgba(255, 255, 255, 0.03);
+}
+
+.subdomainCard .subdomainUrl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: -4px;
+}
+
+.subdomainCard .subdomainUrl code {
+  font-size: 13px;
+  color: #666;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Courier New', monospace;
+  background: #f5f5f5;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #eaeaea;
+}
+
+[data-theme="dark"] .subdomainCard .subdomainUrl code {
+  color: #999;
+  background: #1a1a1a;
+  border-color: #333;
+}
+
+.subdomainCard .subdomainUrl a {
+  color: #666;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.subdomainCard .subdomainUrl a:hover {
+  color: #000;
+  background: #f5f5f5;
+}
+
+[data-theme="dark"] .subdomainCard .subdomainUrl a {
+  color: #888;
+}
+
+[data-theme="dark"] .subdomainCard .subdomainUrl a:hover {
+  color: #fff;
+  background: #1a1a1a;
+}
+
+.description {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+  margin: 0;
+  min-height: 21px;
+  font-style: italic;
+  opacity: 0.8;
+}
+
+[data-theme="dark"] .description {
+  color: #888;
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 4px;
+  border-top: 1px solid #f0f0f0;
+  margin-top: auto;
+}
+
+[data-theme="dark"] .cardFooter {
+  border-top-color: #222;
+}
+
+.analyticsButton {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #000;
+  color: #fff;
+  border: 1px solid #000;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.analyticsButton:hover {
+  background: #222;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="dark"] .analyticsButton {
+  background: #fff;
+  color: #000;
+  border-color: #fff;
+}
+
+[data-theme="dark"] .analyticsButton:hover {
+  background: #f0f0f0;
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
+}
