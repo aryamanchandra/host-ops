@@ -1,27 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyToken } from '@/lib/auth';
+import { requireAuth } from '@/lib/api-auth';
 import { getDb } from '@/lib/mongodb';
 import { ShortLink } from '@/lib/models';
 
 // GET all short links for authenticated user
 export async function GET(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const token = authHeader.split(' ')[1];
-    const decoded = verifyToken(token);
-
-    if (!decoded) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
-    }
+    const auth = requireAuth(request);
+    if (auth instanceof NextResponse) return auth;
 
     const db = await getDb();
     const links = await db
       .collection<ShortLink>('short_links')
-      .find({ userId: decoded.userId })
+      .find({ userId: auth.userId })
       .sort({ createdAt: -1 })
       .toArray();
 
@@ -35,17 +26,8 @@ export async function GET(request: NextRequest) {
 // POST create new short link
 export async function POST(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const token = authHeader.split(' ')[1];
-    const decoded = verifyToken(token);
-
-    if (!decoded) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
-    }
+    const auth = requireAuth(request);
+    if (auth instanceof NextResponse) return auth;
 
     const { slug, targetUrl, title, description } = await request.json();
 
@@ -85,7 +67,7 @@ export async function POST(request: NextRequest) {
     const newLink: ShortLink = {
       slug: slug.toLowerCase(),
       targetUrl,
-      userId: decoded.userId,
+      userId: auth.userId,
       clicks: 0,
       isActive: true,
       createdAt: new Date(),

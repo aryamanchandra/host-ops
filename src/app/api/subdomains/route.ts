@@ -1,32 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from '@/lib/mongodb';
 import { Subdomain } from '@/lib/models';
-import { verifyToken } from '@/lib/auth';
+import { requireAuth } from '@/lib/api-auth';
 
 // GET all subdomains for authenticated user
 export async function GET(request: NextRequest) {
   try {
-    // Check authentication
-    const token = request.headers.get('authorization')?.replace('Bearer ', '');
-    if (!token) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
-    const decoded = verifyToken(token);
-    if (!decoded) {
-      return NextResponse.json(
-        { error: 'Invalid token' },
-        { status: 401 }
-      );
-    }
+    const auth = requireAuth(request);
+    if (auth instanceof NextResponse) return auth;
 
     const db = await getDb();
     const subdomains = await db
       .collection<Subdomain>('subdomains')
-      .find({ userId: decoded.userId })
+      .find({ userId: auth.userId })
       .sort({ createdAt: -1 })
       .toArray();
 
@@ -43,22 +29,8 @@ export async function GET(request: NextRequest) {
 // POST create new subdomain
 export async function POST(request: NextRequest) {
   try {
-    // Check authentication
-    const token = request.headers.get('authorization')?.replace('Bearer ', '');
-    if (!token) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
-    const decoded = verifyToken(token);
-    if (!decoded) {
-      return NextResponse.json(
-        { error: 'Invalid token' },
-        { status: 401 }
-      );
-    }
+    const auth = requireAuth(request);
+    if (auth instanceof NextResponse) return auth;
 
     const body = await request.json();
     const { subdomain, title, description, content, customCss, metadata } = body;
@@ -96,7 +68,7 @@ export async function POST(request: NextRequest) {
       description: description || '',
       content: content || '',
       customCss: customCss || '',
-      userId: decoded.userId,
+      userId: auth.userId,
       createdAt: new Date(),
       updatedAt: new Date(),
       isActive: true,
