@@ -28,6 +28,10 @@ async function ensureIndexes() {
   // pageviews: analytics queries filter by subdomain over a time window
   await db.collection('pageviews').createIndex({ subdomain: 1, timestamp: -1 });
 
+  // subdomains: subdomain is the public host key (unique); list by owner
+  await db.collection('subdomains').createIndex({ subdomain: 1 }, { unique: true });
+  await db.collection('subdomains').createIndex({ userId: 1, createdAt: -1 });
+
   console.log('Indexes ensured.');
   await client.close();
 }
