@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { trackPageView } from '@/lib/analytics';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,9 +15,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Get visitor info from headers
-    const ip = request.headers.get('x-forwarded-for') || 
-               request.headers.get('x-real-ip') || 
-               'unknown';
+    const ip = getClientIp(request);
+
+    // Throttle anonymous tracking writes per IP (120/min).
+    const limited = rateLimit(`track:${ip}`, 120, 60_000);
+    if (!limited.allowed) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
     const userAgent = request.headers.get('user-agent') || '';
     const referer = request.headers.get('referer') || '';
 
