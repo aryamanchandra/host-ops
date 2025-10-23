@@ -3,6 +3,7 @@ import { getDb } from './mongodb';
 export interface PageView {
   _id?: string;
   subdomain: string;
+  orgId?: string; // Owning organization (multi-tenant scoping)
   path: string;
   timestamp: Date;
   ip?: string;
