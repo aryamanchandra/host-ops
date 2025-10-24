@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "setup": "ts-node scripts/setup.ts"
+    "setup": "ts-node scripts/setup.ts",
+    "test:smoke": "JWT_SECRET=test-secret MONGODB_URI=mongodb://127.0.0.1:27017/smoke ts-node tests/auth.smoke.ts"
   },
   "dependencies": {
     "@auth/mongodb-adapter": "^3.10.0",

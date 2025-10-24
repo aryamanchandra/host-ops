@@ -3,10 +3,13 @@ import jwt from 'jsonwebtoken';
 import { getDb } from './mongodb';
 import { User } from './models';
 
-const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) {
-  throw new Error('JWT_SECRET environment variable is required but not set');
-}
+const JWT_SECRET: string = (() => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('JWT_SECRET environment variable is required but not set');
+  }
+  return secret;
+})();
 
 export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 10);
