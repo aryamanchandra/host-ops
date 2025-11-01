@@ -1,3 +1,12 @@
+export interface SubdomainMetadata {
+  author?: string;
+  tags?: string[];
+  ogImage?: string;
+  canonicalUrl?: string;
+  noindex?: boolean;
+  [key: string]: any;
+}
+
 export interface Subdomain {
   _id: string;
   subdomain: string;
@@ -6,7 +15,7 @@ export interface Subdomain {
   content: string;
   customCss?: string;
   isActive: boolean;
-  metadata?: any;
+  metadata?: SubdomainMetadata;
 }
 
 export interface SubdomainData {
@@ -16,6 +25,6 @@ export interface SubdomainData {
   content: string;
   customCss?: string;
   isActive: boolean;
-  metadata?: any;
+  metadata?: SubdomainMetadata;
 }
 

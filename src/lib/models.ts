@@ -13,6 +13,9 @@ export interface Subdomain {
   metadata?: {
     author?: string;
     tags?: string[];
+    ogImage?: string; // social share image URL
+    canonicalUrl?: string; // override canonical URL
+    noindex?: boolean; // ask crawlers not to index
     [key: string]: any;
   };
 }
