@@ -5,6 +5,10 @@ import { buildSubdomainMetadata } from '@/helpers/metadata';
 import SubdomainContent from '@/components/subdomains/SubdomainContent';
 import AnalyticsTracker from '@/components/subdomains/AnalyticsTracker';
 
+// Render per-request so freshly edited subdomains reflect immediately
+// without a redeploy or cache revalidation window.
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata({
   params,
 }: {
