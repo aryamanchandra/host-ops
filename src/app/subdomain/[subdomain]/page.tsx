@@ -15,7 +15,10 @@ export async function generateMetadata({
   params: { subdomain: string };
 }): Promise<Metadata> {
   const doc = await getSubdomainBySlug(params.subdomain);
-  return buildSubdomainMetadata(doc!, params.subdomain);
+  if (!doc) {
+    return { title: 'Not found', robots: { index: false, follow: false } };
+  }
+  return buildSubdomainMetadata(doc, params.subdomain);
 }
 
 export default async function SubdomainPage({
