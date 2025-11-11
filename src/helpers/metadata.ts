@@ -14,7 +14,8 @@ export function buildSubdomainMetadata(doc: Subdomain, slug: string): Metadata {
     (ROOT_DOMAIN ? `https://${slug}.${ROOT_DOMAIN}` : undefined);
   const ogImage = doc.metadata?.ogImage;
   const description = doc.description || undefined;
-  const noindex = doc.metadata?.noindex === true;
+  // Inactive subdomains and those explicitly flagged should not be indexed.
+  const noindex = doc.metadata?.noindex === true || doc.isActive === false;
 
   return {
     title: doc.title,
