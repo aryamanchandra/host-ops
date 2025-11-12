@@ -155,6 +155,32 @@ npm start
 npm run lint
 ```
 
+## Subdomain Rendering (SSR & SEO)
+
+Public subdomain pages are server-rendered. `src/app/subdomain/[subdomain]/page.tsx`
+is an async server component that reads the subdomain via `getSubdomainBySlug`
+(React `cache()`-deduped) and renders HTML on the server — no client loading
+spinner, and crawlers see full markup.
+
+`generateMetadata()` emits per-subdomain `<head>` tags via
+`buildSubdomainMetadata` ([src/helpers/metadata.ts](src/helpers/metadata.ts)):
+
+- `title`, `description`, canonical URL (`https://{slug}.{NEXT_PUBLIC_ROOT_DOMAIN}`)
+- OpenGraph + Twitter cards
+- `robots: noindex` for inactive subdomains or when `metadata.noindex` is set
+
+Optional SEO fields live inside the subdomain `metadata` object:
+
+| Field | Purpose |
+|-------|---------|
+| `ogImage` | Social share image URL |
+| `canonicalUrl` | Override the canonical URL |
+| `noindex` | Ask crawlers not to index the page |
+
+Missing or inactive subdomains call `notFound()` and render the styled
+not-found boundary. Pages use `dynamic = 'force-dynamic'` so edits appear
+immediately. Author HTML is sanitized via `sanitizeHtml` before rendering.
+
 ## Support
 
 For issues or questions, please open an issue on GitHub.
