@@ -1,4 +1,5 @@
 import { getDb } from './mongodb';
+import { parseUserAgent } from './userAgent';
 
 export interface PageView {
   _id?: string;
@@ -34,33 +35,9 @@ export async function trackPageView(data: {
 }): Promise<void> {
   const db = await getDb();
   
-  // Parse user agent for device and browser info
-  let device = 'Unknown';
-  let browser = 'Unknown';
-  let os = 'Unknown';
-  
-  if (data.userAgent) {
-    const ua = data.userAgent.toLowerCase();
-    
-    // Device detection
-    if (ua.includes('mobile')) device = 'Mobile';
-    else if (ua.includes('tablet')) device = 'Tablet';
-    else device = 'Desktop';
-    
-    // Browser detection
-    if (ua.includes('chrome') && !ua.includes('edg')) browser = 'Chrome';
-    else if (ua.includes('safari') && !ua.includes('chrome')) browser = 'Safari';
-    else if (ua.includes('firefox')) browser = 'Firefox';
-    else if (ua.includes('edg')) browser = 'Edge';
-    
-    // OS detection
-    if (ua.includes('windows')) os = 'Windows';
-    else if (ua.includes('mac')) os = 'macOS';
-    else if (ua.includes('linux')) os = 'Linux';
-    else if (ua.includes('android')) os = 'Android';
-    else if (ua.includes('ios') || ua.includes('iphone') || ua.includes('ipad')) os = 'iOS';
-  }
-  
+  // Classify the visitor's user agent (device/browser/OS) via ua-parser-js.
+  const { device, browser, os } = parseUserAgent(data.userAgent);
+
   const pageView = {
     subdomain: data.subdomain,
     path: data.path,
