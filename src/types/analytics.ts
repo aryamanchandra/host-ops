@@ -5,6 +5,8 @@ export interface AnalyticsData {
   topReferers: Array<{ referer: string; views: number }>;
   deviceBreakdown: Array<{ device: string; count: number }>;
   browserBreakdown: Array<{ browser: string; count: number }>;
+  osBreakdown?: Array<{ os: string; count: number }>;
+  browserVersionBreakdown?: Array<{ browser: string; version: string; count: number }>;
   viewsByDate: Array<{ date: string; views: number }>;
 }
 
