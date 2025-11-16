@@ -13,7 +13,9 @@ export interface PageView {
   country?: string;
   device?: string;
   browser?: string;
+  browserVersion?: string;
   os?: string;
+  osVersion?: string;
 }
 
 export interface AnalyticsSummary {
@@ -36,7 +38,9 @@ export async function trackPageView(data: {
   const db = await getDb();
   
   // Classify the visitor's user agent (device/browser/OS) via ua-parser-js.
-  const { device, browser, os } = parseUserAgent(data.userAgent);
+  const { device, browser, browserVersion, os, osVersion } = parseUserAgent(
+    data.userAgent
+  );
 
   const pageView = {
     subdomain: data.subdomain,
@@ -47,7 +51,9 @@ export async function trackPageView(data: {
     referer: data.referer,
     device,
     browser,
+    browserVersion,
     os,
+    osVersion,
   };
   
   await db.collection('pageviews').insertOne(pageView as any);
