@@ -121,7 +121,32 @@ export async function getAnalytics(
   const browserBreakdown = Array.from(browserMap.entries())
     .map(([browser, count]) => ({ browser, count }))
     .sort((a, b) => b.count - a.count);
-  
+
+  // OS breakdown
+  const osMap = new Map<string, number>();
+  views.forEach(v => {
+    osMap.set(v.os || 'Unknown', (osMap.get(v.os || 'Unknown') || 0) + 1);
+  });
+  const osBreakdown = Array.from(osMap.entries())
+    .map(([os, count]) => ({ os, count }))
+    .sort((a, b) => b.count - a.count);
+
+  // Browser version breakdown (browser + major version), top 10
+  const browserVersionMap = new Map<string, number>();
+  views.forEach(v => {
+    const browser = v.browser || 'Unknown';
+    const version = v.browserVersion || 'Unknown';
+    const key = `${browser}|${version}`;
+    browserVersionMap.set(key, (browserVersionMap.get(key) || 0) + 1);
+  });
+  const browserVersionBreakdown = Array.from(browserVersionMap.entries())
+    .map(([key, count]) => {
+      const [browser, version] = key.split('|');
+      return { browser, version, count };
+    })
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 10);
+
   // Views by date
   const dateMap = new Map<string, number>();
   views.forEach(v => {
@@ -139,6 +164,8 @@ export async function getAnalytics(
     topReferers,
     deviceBreakdown,
     browserBreakdown,
+    osBreakdown,
+    browserVersionBreakdown,
     viewsByDate,
   };
 }
