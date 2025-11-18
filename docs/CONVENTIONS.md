@@ -34,3 +34,10 @@ if (auth instanceof NextResponse) return auth;
 ## Indexes
 
 - Add new collection indexes to [../scripts/setup.ts](../scripts/setup.ts) (`npm run setup`). Never rely on unindexed queries for hot paths.
+
+## Analytics: user-agent classification
+
+- `parseUserAgent` in [../src/lib/userAgent.ts](../src/lib/userAgent.ts) (wrapping `ua-parser-js`) is the **single source of truth** for device/browser/OS classification. Do not hand-roll UA substring matching.
+- It normalizes to the canonical labels: device `Desktop|Mobile|Tablet|Other`, browser `Chrome|Safari|Firefox|Edge`, OS `Windows|macOS|iOS|Android|Linux`, plus major `browserVersion`/`osVersion`.
+- Legacy pageviews recorded before this change lack version fields; aggregations bucket them as `Unknown`.
+- Classification rules are locked by [../src/lib/__tests__/userAgent.test.ts](../src/lib/__tests__/userAgent.test.ts) (`npm run test:ua`).
