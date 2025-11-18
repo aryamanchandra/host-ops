@@ -10,6 +10,7 @@ import { useAuth, useAnalytics } from '@/hooks';
 import { useSubdomains } from '@/hooks/useSubdomains';
 import StatsGrid from '@/components/analytics/StatsGrid';
 import TopTables from '@/components/analytics/TopTables';
+import BreakdownTables from '@/components/analytics/BreakdownTables';
 
 const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN!;
 
@@ -101,6 +102,7 @@ export default function AnalyticsPage() {
             </div>
             <StatsGrid analytics={analytics} />
             <TopTables analytics={analytics} />
+            <BreakdownTables analytics={analytics} />
           </div>
         )}
       </div>
