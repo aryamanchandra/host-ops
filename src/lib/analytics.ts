@@ -135,7 +135,10 @@ export async function getAnalytics(
   const browserVersionMap = new Map<string, number>();
   views.forEach(v => {
     const browser = v.browser || 'Unknown';
-    const version = v.browserVersion || 'Unknown';
+    // Legacy pageviews (recorded before ua-parser-js) and zero/blank values
+    // have no version — bucket them as Unknown rather than dropping them.
+    const raw = (v.browserVersion || '').trim();
+    const version = raw && raw !== '0' ? raw : 'Unknown';
     const key = `${browser}|${version}`;
     browserVersionMap.set(key, (browserVersionMap.get(key) || 0) + 1);
   });
