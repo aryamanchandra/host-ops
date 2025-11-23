@@ -163,6 +163,38 @@ export async function getAnalytics(
     .sort((a, b) => b.count - a.count)
     .slice(0, 10);
 
+  // Country breakdown (resolved geo only)
+  const countryMap = new Map<string, { country: string; count: number }>();
+  views.forEach(v => {
+    if (!v.countryCode) return;
+    const entry = countryMap.get(v.countryCode) || {
+      country: v.country || v.countryCode,
+      count: 0,
+    };
+    entry.count += 1;
+    countryMap.set(v.countryCode, entry);
+  });
+  const countryBreakdown = Array.from(countryMap.entries())
+    .map(([countryCode, { country, count }]) => ({ country, countryCode, count }))
+    .sort((a, b) => b.count - a.count);
+
+  // Top cities
+  const cityMap = new Map<string, { city: string; countryCode: string; count: number }>();
+  views.forEach(v => {
+    if (!v.city) return;
+    const key = `${v.city}|${v.countryCode || ''}`;
+    const entry = cityMap.get(key) || {
+      city: v.city,
+      countryCode: v.countryCode || '',
+      count: 0,
+    };
+    entry.count += 1;
+    cityMap.set(key, entry);
+  });
+  const topCities = Array.from(cityMap.values())
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 10);
+
   // Views by date
   const dateMap = new Map<string, number>();
   views.forEach(v => {
@@ -182,6 +214,8 @@ export async function getAnalytics(
     browserBreakdown,
     osBreakdown,
     browserVersionBreakdown,
+    countryBreakdown,
+    topCities,
     viewsByDate,
   };
 }
