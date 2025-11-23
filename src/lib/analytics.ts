@@ -1,5 +1,6 @@
 import { getDb } from './mongodb';
 import { parseUserAgent } from './userAgent';
+import { lookupGeo } from './geo';
 
 export interface PageView {
   _id?: string;
@@ -49,6 +50,9 @@ export async function trackPageView(data: {
     data.userAgent
   );
 
+  // Resolve coarse geo from the visitor IP (null for private/unresolved).
+  const geo = lookupGeo(data.ip);
+
   const pageView = {
     subdomain: data.subdomain,
     path: data.path,
@@ -56,6 +60,10 @@ export async function trackPageView(data: {
     ip: data.ip,
     userAgent: data.userAgent,
     referer: data.referer,
+    country: geo?.country,
+    countryCode: geo?.countryCode,
+    region: geo?.region,
+    city: geo?.city,
     device,
     browser,
     browserVersion,
