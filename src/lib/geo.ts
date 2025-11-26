@@ -28,10 +28,14 @@ export function countryName(code: string): string {
   return COUNTRY_NAMES[code] || code;
 }
 
-/** Strip IPv6-mapped IPv4 prefix and surrounding whitespace. */
+/**
+ * Normalize a forwarded IP value: take the first hop of a comma-separated
+ * x-forwarded-for chain (the original client), strip the IPv6-mapped IPv4
+ * prefix, and trim whitespace.
+ */
 export function normalizeIp(ip?: string): string {
   if (!ip) return '';
-  let value = ip.trim();
+  let value = ip.split(',')[0].trim();
   if (value.startsWith('::ffff:')) value = value.slice('::ffff:'.length);
   return value;
 }
