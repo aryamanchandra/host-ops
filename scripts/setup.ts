@@ -27,6 +27,8 @@ async function ensureIndexes() {
 
   // pageviews: analytics queries filter by subdomain over a time window
   await db.collection('pageviews').createIndex({ subdomain: 1, timestamp: -1 });
+  // pageviews: geo aggregation groups by country within a subdomain
+  await db.collection('pageviews').createIndex({ subdomain: 1, countryCode: 1 });
 
   // subdomains: subdomain is the public host key (unique); list by owner
   await db.collection('subdomains').createIndex({ subdomain: 1 }, { unique: true });
