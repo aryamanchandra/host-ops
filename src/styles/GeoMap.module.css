@@ -1,0 +1,104 @@
+.mapCard {
+  background: #fff;
+  border: 1px solid #eaeaea;
+  border-radius: 12px;
+  padding: 24px;
+  margin-top: 24px;
+}
+
+.mapCard h3 {
+  margin: 0 0 16px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #000;
+}
+
+.mapWrap {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.mapWrap svg {
+  width: 100%;
+  height: auto;
+}
+
+.tooltip {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: #000;
+  color: #fff;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  font-size: 12px;
+  color: #666;
+}
+
+.legendBar {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #f5f5f5, #0070f3);
+}
+
+.empty {
+  color: #999;
+  font-size: 14px;
+  padding: 32px 0;
+  text-align: center;
+}
+
+.countryCell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.flag {
+  font-size: 16px;
+}
+
+.pctBar {
+  flex: 1;
+  height: 6px;
+  background: #f5f5f5;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-left: 8px;
+  min-width: 40px;
+}
+
+.pctFill {
+  display: block;
+  height: 100%;
+  background: #0070f3;
+  border-radius: 3px;
+}
+
+[data-theme='dark'] .mapCard {
+  background: #111;
+  border-color: #333;
+}
+
+[data-theme='dark'] .mapCard h3 {
+  color: #fff;
+}
+
+[data-theme='dark'] .pctBar {
+  background: #222;
+}
+
+[data-theme='dark'] .legend {
+  color: #888;
+}
