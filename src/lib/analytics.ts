@@ -163,16 +163,15 @@ export async function getAnalytics(
     .sort((a, b) => b.count - a.count)
     .slice(0, 10);
 
-  // Country breakdown (resolved geo only)
+  // Country breakdown — private/loopback/unresolved IPs (no countryCode)
+  // are bucketed under an explicit "Unknown" entry rather than dropped.
   const countryMap = new Map<string, { country: string; count: number }>();
   views.forEach(v => {
-    if (!v.countryCode) return;
-    const entry = countryMap.get(v.countryCode) || {
-      country: v.country || v.countryCode,
-      count: 0,
-    };
+    const code = v.countryCode || 'XX';
+    const name = v.countryCode ? v.country || v.countryCode : 'Unknown';
+    const entry = countryMap.get(code) || { country: name, count: 0 };
     entry.count += 1;
-    countryMap.set(v.countryCode, entry);
+    countryMap.set(code, entry);
   });
   const countryBreakdown = Array.from(countryMap.entries())
     .map(([countryCode, { country, count }]) => ({ country, countryCode, count }))
