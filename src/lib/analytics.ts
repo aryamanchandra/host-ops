@@ -1,6 +1,7 @@
 import { getDb } from './mongodb';
 import { parseUserAgent } from './userAgent';
 import { lookupGeo } from './geo';
+import { parseUtmParams } from './utm';
 
 export interface PageView {
   _id?: string;
@@ -20,6 +21,11 @@ export interface PageView {
   browserVersion?: string;
   os?: string;
   osVersion?: string;
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+  utmTerm?: string;
+  utmContent?: string;
 }
 
 export interface AnalyticsSummary {
@@ -42,6 +48,7 @@ export async function trackPageView(data: {
   ip?: string;
   userAgent?: string;
   referer?: string;
+  landingUrl?: string;
 }): Promise<void> {
   const db = await getDb();
   
@@ -53,6 +60,9 @@ export async function trackPageView(data: {
   // Resolve coarse geo from the visitor IP (null for private/unresolved).
   const geo = lookupGeo(data.ip);
 
+  // Extract campaign attribution from the landing URL.
+  const utm = parseUtmParams(data.landingUrl);
+
   const pageView = {
     subdomain: data.subdomain,
     path: data.path,
@@ -60,6 +70,11 @@ export async function trackPageView(data: {
     ip: data.ip,
     userAgent: data.userAgent,
     referer: data.referer,
+    utmSource: utm.utmSource,
+    utmMedium: utm.utmMedium,
+    utmCampaign: utm.utmCampaign,
+    utmTerm: utm.utmTerm,
+    utmContent: utm.utmContent,
     country: geo?.country,
     countryCode: geo?.countryCode,
     region: geo?.region,
