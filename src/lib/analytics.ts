@@ -39,6 +39,9 @@ export interface AnalyticsSummary {
   browserVersionBreakdown?: Array<{ browser: string; version: string; count: number }>;
   countryBreakdown?: Array<{ country: string; countryCode: string; count: number }>;
   topCities?: Array<{ city: string; countryCode: string; count: number }>;
+  topSources?: Array<{ source: string; count: number }>;
+  topMediums?: Array<{ medium: string; count: number }>;
+  topCampaigns?: Array<{ campaign: string; count: number }>;
   viewsByDate: Array<{ date: string; views: number }>;
 }
 
@@ -209,6 +212,28 @@ export async function getAnalytics(
     .sort((a, b) => b.count - a.count)
     .slice(0, 10);
 
+  // UTM campaign attribution: top sources / mediums / campaigns
+  const sourceMap = new Map<string, number>();
+  const mediumMap = new Map<string, number>();
+  const campaignMap = new Map<string, number>();
+  views.forEach(v => {
+    if (v.utmSource) sourceMap.set(v.utmSource, (sourceMap.get(v.utmSource) || 0) + 1);
+    if (v.utmMedium) mediumMap.set(v.utmMedium, (mediumMap.get(v.utmMedium) || 0) + 1);
+    if (v.utmCampaign) campaignMap.set(v.utmCampaign, (campaignMap.get(v.utmCampaign) || 0) + 1);
+  });
+  const topSources = Array.from(sourceMap.entries())
+    .map(([source, count]) => ({ source, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 10);
+  const topMediums = Array.from(mediumMap.entries())
+    .map(([medium, count]) => ({ medium, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 10);
+  const topCampaigns = Array.from(campaignMap.entries())
+    .map(([campaign, count]) => ({ campaign, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 10);
+
   // Views by date
   const dateMap = new Map<string, number>();
   views.forEach(v => {
@@ -230,6 +255,9 @@ export async function getAnalytics(
     browserVersionBreakdown,
     countryBreakdown,
     topCities,
+    topSources,
+    topMediums,
+    topCampaigns,
     viewsByDate,
   };
 }
