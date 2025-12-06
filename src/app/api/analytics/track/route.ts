@@ -5,7 +5,7 @@ import { rateLimit, getClientIp } from '@/lib/rate-limit';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { subdomain, path } = body;
+    const { subdomain, path, landingUrl } = body;
 
     if (!subdomain) {
       return NextResponse.json(
@@ -31,6 +31,7 @@ export async function POST(request: NextRequest) {
       ip,
       userAgent,
       referer,
+      landingUrl,
     });
 
     return NextResponse.json({ success: true });
