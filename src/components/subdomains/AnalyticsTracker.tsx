@@ -12,7 +12,12 @@ export default function AnalyticsTracker({ subdomain }: { subdomain: string }) {
     fetch('/api/analytics/track', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ subdomain, path: window.location.pathname }),
+      body: JSON.stringify({
+        subdomain,
+        path: window.location.pathname,
+        // Full URL so the server can extract utm_* campaign params.
+        landingUrl: window.location.href,
+      }),
     }).catch((err) => console.error('Analytics tracking failed:', err));
   }, [subdomain]);
 
