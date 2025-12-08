@@ -13,6 +13,7 @@ import TopTables from '@/components/analytics/TopTables';
 import BreakdownTables from '@/components/analytics/BreakdownTables';
 import GeoMap from '@/components/analytics/GeoMap';
 import TopCountries from '@/components/analytics/TopCountries';
+import CampaignBreakdown from '@/components/analytics/CampaignBreakdown';
 
 const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN!;
 
@@ -107,6 +108,7 @@ export default function AnalyticsPage() {
             <BreakdownTables analytics={analytics} />
             <GeoMap analytics={analytics} />
             <TopCountries analytics={analytics} />
+            <CampaignBreakdown analytics={analytics} />
           </div>
         )}
       </div>
