@@ -1,0 +1,39 @@
+.card {
+  background: #fff;
+  border: 1px solid #eaeaea;
+  border-radius: 12px;
+  padding: 24px;
+  margin-top: 24px;
+}
+
+.card h3 {
+  margin: 0 0 16px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #000;
+}
+
+.chartWrap {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.empty {
+  color: #999;
+  font-size: 14px;
+  padding: 24px 0;
+  text-align: center;
+}
+
+[data-theme='dark'] .card {
+  background: #111;
+  border-color: #333;
+}
+
+[data-theme='dark'] .card h3 {
+  color: #fff;
+}
+
+[data-theme='dark'] .empty {
+  color: #777;
+}
