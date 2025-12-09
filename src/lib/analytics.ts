@@ -63,8 +63,8 @@ export async function trackPageView(data: {
   // Resolve coarse geo from the visitor IP (null for private/unresolved).
   const geo = lookupGeo(data.ip);
 
-  // Extract campaign attribution from the landing URL.
-  const utm = parseUtmParams(data.landingUrl);
+  // Extract campaign attribution from the landing URL (length-capped).
+  const utm = parseUtmParams(data.landingUrl?.slice(0, 2000));
 
   const pageView = {
     subdomain: data.subdomain,

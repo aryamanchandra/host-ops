@@ -20,7 +20,12 @@ export function parseUtmParams(landingUrl?: string): UtmParams {
     qs = new URLSearchParams(idx >= 0 ? landingUrl.slice(idx + 1) : landingUrl);
   }
 
-  const get = (key: string): string | undefined => qs.get(key) || undefined;
+  // Cap each value to a sane length and drop empties so undefined utm
+  // params are never persisted.
+  const get = (key: string): string | undefined => {
+    const v = qs.get(key);
+    return v ? v.slice(0, 200) : undefined;
+  };
 
   return {
     utmSource: get('utm_source'),
