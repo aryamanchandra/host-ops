@@ -2,6 +2,9 @@ import { getDb } from './mongodb';
 import { parseUserAgent } from './userAgent';
 import { lookupGeo } from './geo';
 import { parseUtmParams } from './utm';
+import type { LiveAnalytics } from '@/types/live';
+
+export const LIVE_WINDOW_SECONDS = 300; // visitors active within 5 minutes
 
 export interface PageView {
   _id?: string;
@@ -287,5 +290,42 @@ export async function getAllSubdomainsAnalytics(days: number = 30): Promise<Map<
   }
   
   return analyticsMap;
+}
+
+/**
+ * Live snapshot for a subdomain: unique active visitors, views, and the most
+ * recent events within a short rolling window. Read-only over `pageviews`.
+ */
+export async function getLiveAnalytics(
+  subdomain: string,
+  windowSeconds: number = LIVE_WINDOW_SECONDS
+): Promise<LiveAnalytics> {
+  const db = await getDb();
+  const since = new Date(Date.now() - windowSeconds * 1000);
+
+  const views = await db
+    .collection<PageView>('pageviews')
+    .find({ subdomain, timestamp: { $gte: since } })
+    .sort({ timestamp: -1 })
+    .limit(200)
+    .toArray();
+
+  const activeVisitors = new Set(views.map(v => v.ip).filter(Boolean)).size;
+  const recentEvents = views.slice(0, 20).map(v => ({
+    path: v.path,
+    country: v.country,
+    countryCode: v.countryCode,
+    device: v.device,
+    browser: v.browser,
+    referer: v.referer,
+    timestamp: v.timestamp.toISOString(),
+  }));
+
+  return {
+    activeVisitors,
+    viewsInWindow: views.length,
+    windowSeconds,
+    recentEvents,
+  };
 }
 
