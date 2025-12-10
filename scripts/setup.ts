@@ -31,6 +31,8 @@ async function ensureIndexes() {
   await db.collection('pageviews').createIndex({ subdomain: 1, countryCode: 1 });
   // pageviews: campaign attribution scans by subdomain + utm campaign over time
   await db.collection('pageviews').createIndex({ subdomain: 1, utmCampaign: 1, timestamp: -1 });
+  // pageviews: live dashboard queries the most recent events by timestamp
+  await db.collection('pageviews').createIndex({ timestamp: -1 });
 
   // subdomains: subdomain is the public host key (unique); list by owner
   await db.collection('subdomains').createIndex({ subdomain: 1 }, { unique: true });
