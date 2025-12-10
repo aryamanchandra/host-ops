@@ -41,3 +41,20 @@ if (auth instanceof NextResponse) return auth;
 - It normalizes to the canonical labels: device `Desktop|Mobile|Tablet|Other`, browser `Chrome|Safari|Firefox|Edge`, OS `Windows|macOS|iOS|Android|Linux`, plus major `browserVersion`/`osVersion`.
 - Legacy pageviews recorded before this change lack version fields; aggregations bucket them as `Unknown`.
 - Classification rules are locked by [../src/lib/__tests__/userAgent.test.ts](../src/lib/__tests__/userAgent.test.ts) (`npm run test:ua`).
+
+## Analytics: UTM campaign tracking
+
+- The subdomain `AnalyticsTracker` sends the full `landingUrl` to `/api/analytics/track`.
+- `parseUtmParams` in [../src/lib/utm.ts](../src/lib/utm.ts) extracts the standard tags and persists them on each pageview:
+
+  | Param | Field |
+  |-------|-------|
+  | `utm_source` | `utmSource` |
+  | `utm_medium` | `utmMedium` |
+  | `utm_campaign` | `utmCampaign` |
+  | `utm_term` | `utmTerm` |
+  | `utm_content` | `utmContent` |
+
+- Values are capped at 200 chars; empty params are dropped (never stored as `undefined`).
+- `getAnalytics` aggregates `topSources` / `topMediums` / `topCampaigns`, rendered by `CampaignBreakdown`.
+- Parsing rules are locked by [../src/lib/__tests__/utm.test.ts](../src/lib/__tests__/utm.test.ts) (`npm run test:utm`).
