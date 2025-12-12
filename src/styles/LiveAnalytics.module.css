@@ -1,0 +1,124 @@
+.liveCard {
+  background: #fff;
+  border: 1px solid #eaeaea;
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+
+.liveHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.liveLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #000;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dotLive {
+  background: #06ce6b;
+  box-shadow: 0 0 0 0 rgba(6, 206, 107, 0.6);
+  animation: pulse 1.6s infinite;
+}
+
+.dotIdle {
+  background: #ccc;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(6, 206, 107, 0.55); }
+  70% { box-shadow: 0 0 0 8px rgba(6, 206, 107, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(6, 206, 107, 0); }
+}
+
+.activeCount {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #666;
+}
+
+.feed {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.event {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 4px;
+  border-bottom: 1px solid #f5f5f5;
+  font-size: 13px;
+  animation: fadeSlide 0.35s ease;
+}
+
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.eventFlag {
+  font-size: 15px;
+}
+
+.eventPath {
+  font-weight: 500;
+  color: #000;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.eventMeta {
+  color: #888;
+}
+
+.eventTime {
+  color: #aaa;
+  font-variant-numeric: tabular-nums;
+  min-width: 56px;
+  text-align: right;
+}
+
+.empty {
+  color: #999;
+  font-size: 13px;
+  padding: 12px 0;
+}
+
+[data-theme='dark'] .liveCard {
+  background: #111;
+  border-color: #333;
+}
+
+[data-theme='dark'] .liveLabel {
+  color: #fff;
+}
+
+[data-theme='dark'] .eventPath {
+  color: #fff;
+}
+
+[data-theme='dark'] .event {
+  border-bottom-color: #222;
+}
