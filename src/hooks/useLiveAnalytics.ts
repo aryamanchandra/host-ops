@@ -41,6 +41,12 @@ export function useLiveAnalytics(subdomain: string, token: string) {
     };
 
     connect();
+
+    return () => {
+      es?.close();
+      clearTimeout(reconnectTimer);
+      setConnected(false);
+    };
   }, [subdomain, token]);
 
   return { live, connected };
