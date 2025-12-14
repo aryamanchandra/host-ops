@@ -14,6 +14,7 @@ import BreakdownTables from '@/components/analytics/BreakdownTables';
 import GeoMap from '@/components/analytics/GeoMap';
 import TopCountries from '@/components/analytics/TopCountries';
 import CampaignBreakdown from '@/components/analytics/CampaignBreakdown';
+import LiveSection from '@/components/analytics/LiveSection';
 
 const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN!;
 
@@ -103,6 +104,7 @@ export default function AnalyticsPage() {
                 </button>
               </div>
             </div>
+            <LiveSection subdomain={subdomain} token={token} />
             <StatsGrid analytics={analytics} />
             <TopTables analytics={analytics} />
             <BreakdownTables analytics={analytics} />
