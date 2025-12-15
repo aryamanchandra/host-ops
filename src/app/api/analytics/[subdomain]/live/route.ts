@@ -19,6 +19,15 @@ export async function GET(
   }
 
   const { subdomain } = params;
+
+  // Polling fallback for clients without EventSource: a single JSON snapshot.
+  if (request.nextUrl.searchParams.get('poll') === '1') {
+    const snapshot = await getLiveAnalytics(subdomain);
+    return Response.json(snapshot, {
+      headers: { 'Cache-Control': 'no-store' },
+    });
+  }
+
   const encoder = new TextEncoder();
 
   const stream = new ReadableStream({

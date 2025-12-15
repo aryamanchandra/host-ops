@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import type { LiveAnalytics } from '@/types/live';
 
+const POLL_INTERVAL_MS = 7000;
+
 /**
  * Subscribe to the live analytics SSE stream for a subdomain. Reconnects
- * with exponential backoff on transient errors.
+ * with exponential backoff, pauses while the tab is hidden, and falls back
+ * to JSON polling when EventSource is unavailable.
  */
 export function useLiveAnalytics(subdomain: string, token: string) {
   const [live, setLive] = useState<LiveAnalytics | null>(null);
@@ -15,11 +18,32 @@ export function useLiveAnalytics(subdomain: string, token: string) {
 
     let es: EventSource | null = null;
     let reconnectTimer: ReturnType<typeof setTimeout>;
+    let pollTimer: ReturnType<typeof setInterval>;
+    let stopped = false;
+
+    const base = `/api/analytics/${subdomain}/live?token=${encodeURIComponent(token)}`;
+    const supportsSse = typeof EventSource !== 'undefined';
+
+    const poll = async () => {
+      try {
+        const res = await fetch(`${base}&poll=1`);
+        if (res.ok) {
+          setLive(await res.json());
+          setConnected(true);
+        }
+      } catch {
+        setConnected(false);
+      }
+    };
+
+    const startPolling = () => {
+      poll();
+      pollTimer = setInterval(poll, POLL_INTERVAL_MS);
+    };
 
     const connect = () => {
-      es = new EventSource(
-        `/api/analytics/${subdomain}/live?token=${encodeURIComponent(token)}`
-      );
+      if (stopped) return;
+      es = new EventSource(base);
       es.onopen = () => {
         setConnected(true);
         retryRef.current = 0;
@@ -40,12 +64,35 @@ export function useLiveAnalytics(subdomain: string, token: string) {
       };
     };
 
-    connect();
+    const stop = () => {
+      es?.close();
+      es = null;
+      clearTimeout(reconnectTimer);
+      clearInterval(pollTimer);
+      setConnected(false);
+    };
+
+    const start = () => {
+      if (supportsSse) connect();
+      else startPolling();
+    };
+
+    const onVisibility = () => {
+      if (document.hidden) {
+        stop();
+      } else {
+        stopped = false;
+        start();
+      }
+    };
+
+    start();
+    document.addEventListener('visibilitychange', onVisibility);
 
     return () => {
-      es?.close();
-      clearTimeout(reconnectTimer);
-      setConnected(false);
+      stopped = true;
+      stop();
+      document.removeEventListener('visibilitychange', onVisibility);
     };
   }, [subdomain, token]);
 
