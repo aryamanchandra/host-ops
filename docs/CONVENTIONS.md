@@ -58,3 +58,10 @@ if (auth instanceof NextResponse) return auth;
 - Values are capped at 200 chars; empty params are dropped (never stored as `undefined`).
 - `getAnalytics` aggregates `topSources` / `topMediums` / `topCampaigns`, rendered by `CampaignBreakdown`.
 - Parsing rules are locked by [../src/lib/__tests__/utm.test.ts](../src/lib/__tests__/utm.test.ts) (`npm run test:utm`).
+
+## Analytics: live dashboard (SSE)
+
+- `GET /api/analytics/[subdomain]/live` streams Server-Sent Events. Each frame is `data: <LiveAnalytics JSON>\n\n`, pushed every 5s.
+- `LiveAnalytics` = `{ activeVisitors, viewsInWindow, windowSeconds, recentEvents[] }`; the window is `LIVE_WINDOW_SECONDS` (300s) in [../src/lib/analytics.ts](../src/lib/analytics.ts).
+- Auth: EventSource can't set headers, so the JWT is passed as `?token=`; `getAuth` accepts header **or** query token.
+- Client `useLiveAnalytics` reconnects with backoff, pauses on hidden tab, and falls back to `?poll=1` JSON snapshots when EventSource is unavailable.
