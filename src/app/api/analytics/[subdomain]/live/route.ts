@@ -1,5 +1,5 @@
-import { NextRequest } from 'next/server';
-import { verifyToken } from '@/lib/auth';
+import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/api-auth';
 import { getLiveAnalytics } from '@/lib/analytics';
 
 export const dynamic = 'force-dynamic';
@@ -7,16 +7,13 @@ export const dynamic = 'force-dynamic';
 const SNAPSHOT_INTERVAL_MS = 5000;
 
 // Server-Sent Events stream of live analytics snapshots. EventSource cannot
-// set headers, so the JWT is passed as a ?token= query param.
+// set headers, so requireAuth also accepts the JWT as a ?token= query param.
 export async function GET(
   request: NextRequest,
   { params }: { params: { subdomain: string } }
 ) {
-  const token = request.nextUrl.searchParams.get('token') || '';
-  const decoded = verifyToken(token);
-  if (!decoded) {
-    return new Response('Unauthorized', { status: 401 });
-  }
+  const auth = requireAuth(request);
+  if (auth instanceof NextResponse) return auth;
 
   const { subdomain } = params;
 

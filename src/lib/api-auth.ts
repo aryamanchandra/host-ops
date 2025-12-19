@@ -12,9 +12,17 @@ export interface AuthContext {
  */
 export function getAuth(request: NextRequest): AuthContext | null {
   const header = request.headers.get('authorization');
-  if (!header || !header.startsWith('Bearer ')) return null;
 
-  const token = header.slice('Bearer '.length).trim();
+  // Bearer header first; fall back to a ?token= query param for transports
+  // that cannot set headers (EventSource / SSE, polling fallback).
+  let token = '';
+  if (header && header.startsWith('Bearer ')) {
+    token = header.slice('Bearer '.length).trim();
+  } else {
+    token = request.nextUrl.searchParams.get('token') || '';
+  }
+  if (!token) return null;
+
   const decoded = verifyToken(token);
   if (!decoded || !decoded.userId) return null;
 
