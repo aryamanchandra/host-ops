@@ -55,6 +55,20 @@ export interface OrgMember {
   createdAt: Date;
 }
 
+export type OrgInviteStatus = 'pending' | 'accepted' | 'revoked' | 'expired';
+
+export interface OrgInvite {
+  _id?: string;
+  orgId: string;
+  email: string; // lowercased
+  role: OrgRole;
+  token: string;
+  invitedBy: string;
+  status: OrgInviteStatus;
+  createdAt: Date;
+  expiresAt: Date;
+}
+
 export interface ShortLink {
   _id?: string;
   slug: string; // e.g., "test", "promo"
