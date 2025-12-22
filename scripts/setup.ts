@@ -38,6 +38,17 @@ async function ensureIndexes() {
   await db.collection('subdomains').createIndex({ subdomain: 1 }, { unique: true });
   await db.collection('subdomains').createIndex({ userId: 1, createdAt: -1 });
 
+  // multi-tenant: organizations, members, invites
+  await db.collection('organizations').createIndex({ slug: 1 }, { unique: true });
+  await db.collection('org_members').createIndex({ orgId: 1, userId: 1 }, { unique: true });
+  await db.collection('org_members').createIndex({ userId: 1 });
+  await db.collection('org_invites').createIndex({ token: 1 }, { unique: true });
+  await db.collection('org_invites').createIndex({ orgId: 1, status: 1 });
+
+  // org-scoped listing of tenant data
+  await db.collection('subdomains').createIndex({ orgId: 1, createdAt: -1 });
+  await db.collection('short_links').createIndex({ orgId: 1, createdAt: -1 });
+
   console.log('Indexes ensured.');
   await client.close();
 }
