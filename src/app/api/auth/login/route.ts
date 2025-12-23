@@ -30,14 +30,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const token = generateToken({ 
+    const token = generateToken({
       userId: user._id?.toString(),
-      username: user.username 
+      username: user.username,
+      orgId: user.defaultOrgId,
     });
 
     return NextResponse.json({
       success: true,
       token,
+      defaultOrgId: user.defaultOrgId,
       user: {
         username: user.username,
         role: user.role,

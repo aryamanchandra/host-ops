@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { getDb } from './mongodb';
 import { User } from './models';
+import { createPersonalOrg } from './orgs';
 
 const JWT_SECRET: string = (() => {
   const secret = process.env.JWT_SECRET;
@@ -19,7 +20,11 @@ export async function verifyPassword(password: string, hashedPassword: string): 
   return bcrypt.compare(password, hashedPassword);
 }
 
-export function generateToken(payload: { userId?: string; username: string }): string {
+export function generateToken(payload: {
+  userId?: string;
+  username: string;
+  orgId?: string;
+}): string {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
 }
 
@@ -51,15 +56,30 @@ export async function createUser(
   const db = await getDb();
   const hashedPassword = password ? await hashPassword(password) : '';
   
-  const user = {
+  const user: any = {
     username,
     password: hashedPassword,
     role,
     createdAt: new Date(),
     ...oauthData,
   };
-  
-  await db.collection('users').insertOne(user as any);
+
+  const result = await db.collection('users').insertOne(user as any);
+  const userId = result.insertedId.toString();
+
+  // Bootstrap a personal organization so the user always has a workspace.
+  const org = await createPersonalOrg({
+    _id: userId,
+    name: user.name,
+    username,
+    email: user.email,
+  });
+  await db
+    .collection('users')
+    .updateOne({ _id: result.insertedId }, { $set: { defaultOrgId: org._id } });
+  user._id = userId;
+  user.defaultOrgId = org._id;
+
   return user;
 }
 
@@ -82,7 +102,7 @@ export async function findOrCreateOAuthUser(
     
     if (!user) {
       // Create new user
-      const newUser = {
+      const newUser: any = {
         username: email,
         email,
         name: userData.name,
@@ -92,8 +112,20 @@ export async function findOrCreateOAuthUser(
         role: 'user' as const,
         createdAt: new Date(),
       };
-      
-      await db.collection('users').insertOne(newUser as any);
+
+      const inserted = await db.collection('users').insertOne(newUser as any);
+      const newId = inserted.insertedId.toString();
+      const org = await createPersonalOrg({
+        _id: newId,
+        name: userData.name,
+        username: email,
+        email,
+      });
+      await db
+        .collection('users')
+        .updateOne({ _id: inserted.insertedId }, { $set: { defaultOrgId: org._id } });
+      newUser._id = newId;
+      newUser.defaultOrgId = org._id;
       return newUser as User;
     } else {
       // Update existing user with Google ID

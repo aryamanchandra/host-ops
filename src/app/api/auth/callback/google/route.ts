@@ -78,9 +78,10 @@ export async function GET(request: NextRequest) {
     });
 
     // Generate JWT token
-    const token = generateToken({ 
+    const token = generateToken({
       userId: user._id?.toString(),
-      username: user.username 
+      username: user.username,
+      orgId: user.defaultOrgId,
     });
 
     // Prepare user info for frontend
@@ -94,6 +95,9 @@ export async function GET(request: NextRequest) {
     const redirectUrl = new URL('/', request.url);
     redirectUrl.searchParams.set('token', token);
     redirectUrl.searchParams.set('userInfo', encodeURIComponent(JSON.stringify(userInfoForFrontend)));
+    if (user.defaultOrgId) {
+      redirectUrl.searchParams.set('orgId', user.defaultOrgId);
+    }
 
     const response = NextResponse.redirect(redirectUrl);
     
