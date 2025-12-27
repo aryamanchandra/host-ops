@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from '@/lib/mongodb';
 import { Subdomain } from '@/lib/models';
-import { requireAuth } from '@/lib/api-auth';
+import { requireAuth, resolveOrgId } from '@/lib/api-auth';
 
 // GET all subdomains for authenticated user
 export async function GET(request: NextRequest) {
@@ -9,10 +9,15 @@ export async function GET(request: NextRequest) {
     const auth = requireAuth(request);
     if (auth instanceof NextResponse) return auth;
 
+    // Scope by current org when one is selected; fall back to legacy
+    // per-user scoping otherwise.
+    const orgId = await resolveOrgId(request, auth.userId);
+    const filter = orgId ? { orgId } : { userId: auth.userId };
+
     const db = await getDb();
     const subdomains = await db
       .collection<Subdomain>('subdomains')
-      .find({ userId: auth.userId })
+      .find(filter)
       .sort({ createdAt: -1 })
       .toArray();
 
@@ -31,6 +36,8 @@ export async function POST(request: NextRequest) {
   try {
     const auth = requireAuth(request);
     if (auth instanceof NextResponse) return auth;
+
+    const orgId = await resolveOrgId(request, auth.userId);
 
     const body = await request.json();
     const { subdomain, title, description, content, customCss, metadata } = body;
@@ -69,6 +76,7 @@ export async function POST(request: NextRequest) {
       content: content || '',
       customCss: customCss || '',
       userId: auth.userId,
+      orgId: orgId || undefined,
       createdAt: new Date(),
       updatedAt: new Date(),
       isActive: true,

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAuth } from '@/lib/api-auth';
+import { requireAuth, resolveOrgId } from '@/lib/api-auth';
 import { getDb } from '@/lib/mongodb';
 import { ShortLink } from '@/lib/models';
 
@@ -9,10 +9,13 @@ export async function GET(request: NextRequest) {
     const auth = requireAuth(request);
     if (auth instanceof NextResponse) return auth;
 
+    const orgId = await resolveOrgId(request, auth.userId);
+    const filter = orgId ? { orgId } : { userId: auth.userId };
+
     const db = await getDb();
     const links = await db
       .collection<ShortLink>('short_links')
-      .find({ userId: auth.userId })
+      .find(filter)
       .sort({ createdAt: -1 })
       .toArray();
 
@@ -28,6 +31,8 @@ export async function POST(request: NextRequest) {
   try {
     const auth = requireAuth(request);
     if (auth instanceof NextResponse) return auth;
+
+    const orgId = await resolveOrgId(request, auth.userId);
 
     const { slug, targetUrl, title, description } = await request.json();
 
@@ -68,6 +73,7 @@ export async function POST(request: NextRequest) {
       slug: slug.toLowerCase(),
       targetUrl,
       userId: auth.userId,
+      orgId: orgId || undefined,
       clicks: 0,
       isActive: true,
       createdAt: new Date(),
