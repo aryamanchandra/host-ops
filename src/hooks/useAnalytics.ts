@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { AnalyticsData } from '@/types';
+import { orgHeaders } from './useOrg';
 
 export const useAnalytics = (subdomain: string, token: string, days: number = 30) => {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
@@ -13,7 +14,7 @@ export const useAnalytics = (subdomain: string, token: string, days: number = 30
       setLoading(true);
       setError(null);
       const response = await fetch(`/api/analytics/${subdomain}?days=${days}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: orgHeaders(token),
       });
 
       if (!response.ok) {

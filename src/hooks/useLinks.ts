@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { ShortLink } from '@/types';
+import { orgHeaders } from './useOrg';
 
 export const useLinks = (token: string) => {
   const [links, setLinks] = useState<ShortLink[]>([]);
@@ -13,7 +14,7 @@ export const useLinks = (token: string) => {
       setLoading(true);
       setError(null);
       const response = await fetch('/api/links', {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: orgHeaders(token),
       });
 
       if (!response.ok) {

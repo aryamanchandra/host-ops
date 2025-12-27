@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { Subdomain } from '@/types';
+import { orgHeaders } from './useOrg';
 
 export const useSubdomains = (token: string) => {
   const [subdomains, setSubdomains] = useState<Subdomain[]>([]);
@@ -13,7 +14,7 @@ export const useSubdomains = (token: string) => {
       setLoading(true);
       setError(null);
       const response = await fetch('/api/subdomains', {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: orgHeaders(token),
       });
 
       if (!response.ok) {
