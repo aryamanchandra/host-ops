@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import NextLink from 'next/link';
 import { 
-  Globe, LogOut, Moon, Sun, Search, Shield, BarChart3, 
-  Home, Menu, X as CloseIcon, ChevronDown, ChevronLeft, ChevronRight, Link
+  Globe, LogOut, Moon, Sun, Search, Shield, BarChart3,
+  Home, Menu, X as CloseIcon, ChevronDown, ChevronLeft, ChevronRight, Link, Users
 } from 'lucide-react';
 import styles from '@/styles/Sidebar.module.css';
 import Image from 'next/image';
@@ -43,6 +43,7 @@ export default function Sidebar({
     { path: '/dns-checker', label: 'DNS Checker', icon: Search },
     { path: '/dns-records', label: 'Domain Manager', icon: Shield },
     { path: '/whois', label: 'WHOIS Lookup', icon: Globe },
+    { path: '/team', label: 'Team', icon: Users },
   ];
 
   const isActive = (path: string) => {
