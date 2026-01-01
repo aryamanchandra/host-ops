@@ -9,11 +9,13 @@ import {
 } from 'lucide-react';
 import styles from '@/styles/Sidebar.module.css';
 import Image from 'next/image';
+import OrgSwitcher from '@/components/OrgSwitcher';
 
 interface Props {
   darkMode: boolean;
   onToggleDarkMode: () => void;
   onLogout: () => void;
+  token: string;
   userInfo?: {
     name?: string;
     email?: string;
@@ -24,9 +26,10 @@ interface Props {
 }
 
 export default function Sidebar({ 
-  darkMode, 
-  onToggleDarkMode, 
-  onLogout, 
+  darkMode,
+  onToggleDarkMode,
+  onLogout,
+  token,
   userInfo,
   isCollapsed,
   onToggleCollapse
@@ -70,6 +73,9 @@ export default function Sidebar({
             </div>
             {!isCollapsed && <span className={styles.logoText}>Domainbase</span>}
           </div>
+
+          {/* Organization switcher */}
+          <OrgSwitcher token={token} collapsed={isCollapsed} />
 
           {/* Navigation */}
           <nav className={styles.navigation}>

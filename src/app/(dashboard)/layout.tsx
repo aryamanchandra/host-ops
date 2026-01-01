@@ -180,6 +180,7 @@ export default function DashboardLayout({
         darkMode={darkMode}
         onToggleDarkMode={toggleDarkMode}
         onLogout={handleLogout}
+        token={token}
         userInfo={userInfo}
         isCollapsed={sidebarCollapsed}
         onToggleCollapse={toggleSidebarCollapse}
