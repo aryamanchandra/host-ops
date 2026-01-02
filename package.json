@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "setup": "ts-node scripts/setup.ts",
+    "migrate:orgs": "ts-node scripts/migrate-orgs.ts",
     "test:smoke": "JWT_SECRET=test-secret MONGODB_URI=mongodb://127.0.0.1:27017/smoke ts-node tests/auth.smoke.ts",
     "test:ua": "ts-node src/lib/__tests__/userAgent.test.ts",
     "test:utm": "ts-node src/lib/__tests__/utm.test.ts"
