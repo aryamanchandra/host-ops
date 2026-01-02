@@ -10,7 +10,9 @@ export async function GET(request: NextRequest) {
     if (auth instanceof NextResponse) return auth;
 
     const orgId = await resolveOrgId(request, auth.userId);
-    const filter = orgId ? { orgId } : { userId: auth.userId };
+    const filter = orgId
+      ? { $or: [{ orgId }, { userId: auth.userId, orgId: { $exists: false } }] }
+      : { userId: auth.userId };
 
     const db = await getDb();
     const links = await db

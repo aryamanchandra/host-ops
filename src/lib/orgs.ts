@@ -113,6 +113,31 @@ export async function getMembership(
   return db.collection<OrgMember>('org_members').findOne({ orgId, userId });
 }
 
+export async function getOrganization(
+  orgId: string
+): Promise<(Organization & { _id: string }) | null> {
+  const db = await getDb();
+  try {
+    const org = await db
+      .collection('organizations')
+      .findOne({ _id: new ObjectId(orgId) });
+    return org ? ({ ...(org as any), _id: org._id.toString() } as any) : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function deleteOrganization(orgId: string): Promise<void> {
+  const db = await getDb();
+  try {
+    await db.collection('organizations').deleteOne({ _id: new ObjectId(orgId) });
+  } catch {
+    // invalid id — nothing to delete
+  }
+  await db.collection('org_members').deleteMany({ orgId });
+  await db.collection('org_invites').deleteMany({ orgId });
+}
+
 export async function getOrgMembers(orgId: string) {
   const db = await getDb();
   const members = await db

@@ -12,7 +12,11 @@ export async function GET(request: NextRequest) {
     // Scope by current org when one is selected; fall back to legacy
     // per-user scoping otherwise.
     const orgId = await resolveOrgId(request, auth.userId);
-    const filter = orgId ? { orgId } : { userId: auth.userId };
+    // Org docs plus the caller's own not-yet-migrated legacy docs, so nothing
+    // vanishes if currentOrgId is stale or migration hasn't run.
+    const filter = orgId
+      ? { $or: [{ orgId }, { userId: auth.userId, orgId: { $exists: false } }] }
+      : { userId: auth.userId };
 
     const db = await getDb();
     const subdomains = await db
