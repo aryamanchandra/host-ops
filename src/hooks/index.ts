@@ -6,4 +6,5 @@ export * from './useLiveAnalytics';
 export * from './useDNSRecords';
 export * from './useOrg';
 export * from './useOrgMembers';
+export * from './useTemplates';
 
