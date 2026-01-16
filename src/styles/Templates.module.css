@@ -1,0 +1,291 @@
+.page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.sub {
+  color: #666;
+  margin: 4px 0 24px;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.filter,
+.activeFilter {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid #eaeaea;
+  background: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  color: #444;
+}
+
+.activeFilter {
+  background: #000;
+  color: #fff;
+  border-color: #000;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  border: 1px solid #eaeaea;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+.thumb {
+  position: relative;
+  height: 120px;
+  background: linear-gradient(135deg, #fafafa, #eef2ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.thumbTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+  opacity: 0.6;
+}
+
+.badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: #fff;
+  border: 1px solid #eaeaea;
+  border-radius: 6px;
+  padding: 2px 8px;
+  color: #666;
+}
+
+.body {
+  padding: 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.body h3 {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.body p {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+  flex: 1;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.tag {
+  font-size: 11px;
+  color: #888;
+  background: #f5f5f5;
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+.cardActions {
+  display: flex;
+  gap: 8px;
+}
+
+.preview,
+.use {
+  flex: 1;
+  padding: 8px 0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.preview {
+  background: #fff;
+  border: 1px solid #eaeaea;
+  color: #000;
+}
+
+.use {
+  background: #000;
+  color: #fff;
+  border: none;
+}
+
+.muted {
+  color: #999;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.previewModal {
+  background: #fff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 820px;
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.previewHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.previewHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.iconBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  padding: 4px;
+}
+
+.previewFrame {
+  flex: 1;
+  width: 100%;
+  border: none;
+  background: #fff;
+}
+
+.cloneModal {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.cloneModal h3 {
+  margin: 0 0 4px;
+  font-size: 16px;
+}
+
+.cloneHint {
+  color: #666;
+  font-size: 13px;
+  margin: 0 0 16px;
+}
+
+.cloneModal input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.cloneError {
+  color: #e11d48;
+  font-size: 13px;
+  margin: 10px 0 0;
+}
+
+.cloneActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.cloneActions button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid #eaeaea;
+  background: #fff;
+}
+
+.cloneActions button[type='submit'] {
+  background: #000;
+  color: #fff;
+  border-color: #000;
+}
+
+.cloneActions button[type='submit']:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+[data-theme='dark'] .card,
+[data-theme='dark'] .previewModal,
+[data-theme='dark'] .cloneModal,
+[data-theme='dark'] .filter,
+[data-theme='dark'] .preview {
+  background: #111;
+  border-color: #333;
+  color: #fff;
+}
+
+[data-theme='dark'] .body p,
+[data-theme='dark'] .sub,
+[data-theme='dark'] .cloneHint {
+  color: #999;
+}
+
+[data-theme='dark'] .tag {
+  background: #1a1a1a;
+  color: #aaa;
+}
+
+[data-theme='dark'] .previewHeader {
+  border-bottom-color: #333;
+}
