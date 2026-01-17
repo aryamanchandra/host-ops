@@ -40,7 +40,11 @@ export default function CloneTemplateModal({
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || 'Failed to create subdomain');
+        setError(
+          res.status === 409
+            ? `“${subdomain.trim().toLowerCase()}” is already taken — try another name.`
+            : data.error || 'Failed to create subdomain'
+        );
         setBusy(false);
         return;
       }
