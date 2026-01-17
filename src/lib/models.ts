@@ -1,9 +1,13 @@
+import type { Block, ContentFormat } from '@/types/blocks';
+
 export interface Subdomain {
   _id?: string;
   subdomain: string; // e.g., "blog", "shop", "docs"
   title: string;
   description: string;
-  content: string; // HTML content or page data
+  content: string; // HTML content (source of truth for the public page)
+  contentFormat?: ContentFormat; // how `content` was authored
+  blocks?: Block[]; // structured blocks when contentFormat === 'blocks'
   customCss?: string;
   userId: string; // User who created this subdomain (attribution)
   orgId?: string; // Owning organization (multi-tenant scoping)
