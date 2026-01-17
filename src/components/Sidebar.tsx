@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import NextLink from 'next/link';
 import { 
   Globe, LogOut, Moon, Sun, Search, Shield, BarChart3,
-  Home, Menu, X as CloseIcon, ChevronDown, ChevronLeft, ChevronRight, Link, Users
+  Home, Menu, X as CloseIcon, ChevronDown, ChevronLeft, ChevronRight, Link, Users, LayoutTemplate
 } from 'lucide-react';
 import styles from '@/styles/Sidebar.module.css';
 import Image from 'next/image';
@@ -39,6 +39,7 @@ export default function Sidebar({
 
   const navigationItems = [
     { path: '/subdomains', label: 'Subdomains', icon: Home },
+    { path: '/templates', label: 'Templates', icon: LayoutTemplate },
     { path: '/link-shortener', label: 'Link Shortener', icon: Link },
     { path: '/dns-checker', label: 'DNS Checker', icon: Search },
     { path: '/dns-records', label: 'Domain Manager', icon: Shield },

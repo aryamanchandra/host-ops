@@ -34,6 +34,8 @@ export default function CloneTemplateModal({
           description: template.description,
           content: template.content,
           customCss: template.customCss || '',
+          // Record which template this page was cloned from.
+          metadata: { templateId: template.id, templateName: template.name },
         }),
       });
       const data = await res.json();
