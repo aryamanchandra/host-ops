@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
 import styles from '@/styles/page.module.css';
+import editorStyles from '@/styles/BlockEditor.module.css';
 import type { Subdomain } from '@/types';
+import type { Block, ContentFormat } from '@/types/blocks';
+import { legacyHtmlToBlocks } from '@/lib/blocks';
+import BlockEditor from '@/components/subdomains/BlockEditor';
 
 interface FormData {
   subdomain: string;
@@ -9,6 +13,8 @@ interface FormData {
   description: string;
   content: string;
   customCss: string;
+  contentFormat?: ContentFormat;
+  blocks?: Block[];
 }
 
 interface Props {
@@ -29,10 +35,28 @@ export default function SubdomainForm({
   loading 
 }: Props) {
   const [formData, setFormData] = useState<FormData>(initialData);
+  const [mode, setMode] = useState<'html' | 'blocks'>(
+    (editingSubdomain?.contentFormat as ContentFormat) === 'blocks' ? 'blocks' : 'html'
+  );
+  const [blocks, setBlocks] = useState<Block[]>(
+    (editingSubdomain?.blocks as Block[]) || []
+  );
+
+  const switchToBlocks = () => {
+    // Legacy convert: seed from existing HTML content if there are no blocks.
+    if (blocks.length === 0 && formData.content.trim()) {
+      setBlocks(legacyHtmlToBlocks(formData.content));
+    }
+    setMode('blocks');
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onSubmit(formData);
+    await onSubmit({
+      ...formData,
+      contentFormat: mode,
+      blocks: mode === 'blocks' ? blocks : [],
+    });
   };
 
   return (
@@ -96,15 +120,37 @@ export default function SubdomainForm({
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="content">Content (HTML)</label>
-            <textarea
-              id="content"
-              placeholder="<h1>Welcome!</h1><p>Your content here...</p>"
-              value={formData.content}
-              onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-              rows={10}
-              className={styles.textarea}
-            />
+            <div className={editorStyles.modeToggle}>
+              <label>Content</label>
+              <div className={editorStyles.segmented}>
+                <button
+                  type="button"
+                  className={mode === 'html' ? editorStyles.segActive : editorStyles.seg}
+                  onClick={() => setMode('html')}
+                >
+                  HTML
+                </button>
+                <button
+                  type="button"
+                  className={mode === 'blocks' ? editorStyles.segActive : editorStyles.seg}
+                  onClick={switchToBlocks}
+                >
+                  Blocks
+                </button>
+              </div>
+            </div>
+            {mode === 'html' ? (
+              <textarea
+                id="content"
+                placeholder="<h1>Welcome!</h1><p>Your content here...</p>"
+                value={formData.content}
+                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                rows={10}
+                className={styles.textarea}
+              />
+            ) : (
+              <BlockEditor initialBlocks={blocks} onChange={setBlocks} />
+            )}
           </div>
 
           <div className={styles.formGroup}>
