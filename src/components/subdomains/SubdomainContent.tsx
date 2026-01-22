@@ -1,5 +1,6 @@
 import { Subdomain } from '@/lib/models';
 import { sanitizeHtml } from '@/lib/sanitize';
+import { blocksToHtml } from '@/lib/blocks';
 
 /**
  * Server-rendered presentational markup for a public subdomain page:
@@ -8,7 +9,12 @@ import { sanitizeHtml } from '@/lib/sanitize';
  * sanitized before injection.
  */
 export default function SubdomainContent({ doc }: { doc: Subdomain }) {
-  const safeContent = sanitizeHtml(doc.content || '');
+  // Prefer rendering from structured blocks; fall back to raw HTML content.
+  const rawHtml =
+    doc.contentFormat === 'blocks' && doc.blocks?.length
+      ? blocksToHtml(doc.blocks)
+      : doc.content || '';
+  const safeContent = sanitizeHtml(rawHtml);
 
   return (
     <>
