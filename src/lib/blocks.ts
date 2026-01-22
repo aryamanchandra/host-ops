@@ -1,4 +1,5 @@
 import type { Block } from '@/types/blocks';
+import { sanitizeHtml } from '@/lib/sanitize';
 
 function esc(s: string): string {
   return s
@@ -16,7 +17,7 @@ export function blockToHtml(b: Block): string {
         b.subheading ? `<p>${esc(b.subheading)}</p>` : ''
       }</header>`;
     case 'text':
-      return `<div class="block-text">${b.html}</div>`;
+      return `<div class="block-text">${sanitizeHtml(b.html)}</div>`;
     case 'image':
       return `<img class="block-image" src="${esc(b.src)}" alt="${esc(b.alt || '')}" />`;
     case 'button':
@@ -24,7 +25,7 @@ export function blockToHtml(b: Block): string {
     case 'divider':
       return `<hr class="block-divider" />`;
     case 'embed':
-      return `<div class="block-embed">${b.html}</div>`;
+      return `<div class="block-embed">${sanitizeHtml(b.html)}</div>`;
     default:
       return '';
   }
