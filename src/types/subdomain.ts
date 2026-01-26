@@ -7,12 +7,16 @@ export interface SubdomainMetadata {
   [key: string]: any;
 }
 
+import type { Block, ContentFormat } from '@/types/blocks';
+
 export interface Subdomain {
   _id: string;
   subdomain: string;
   title: string;
   description: string;
   content: string;
+  contentFormat?: ContentFormat;
+  blocks?: Block[];
   customCss?: string;
   isActive: boolean;
   metadata?: SubdomainMetadata;
