@@ -9,6 +9,19 @@ function esc(s: string): string {
     .replace(/"/g, '&quot;');
 }
 
+/**
+ * Allow only safe URL schemes (http/https/mailto/tel) or site-relative paths.
+ * Returns an empty string for anything else (e.g. javascript: URIs).
+ */
+function safeUrl(url: string): string {
+  const trimmed = (url || '').trim();
+  if (!trimmed) return '';
+  if (/^(https?:|mailto:|tel:)/i.test(trimmed)) return trimmed;
+  if (/^\/[^/]/.test(trimmed) || trimmed.startsWith('/')) return trimmed;
+  if (/^[a-z]+:/i.test(trimmed)) return ''; // reject other schemes
+  return trimmed;
+}
+
 /** Serialize a single block to HTML. */
 export function blockToHtml(b: Block): string {
   switch (b.type) {
@@ -18,10 +31,16 @@ export function blockToHtml(b: Block): string {
       }</header>`;
     case 'text':
       return `<div class="block-text">${sanitizeHtml(b.html)}</div>`;
-    case 'image':
-      return `<img class="block-image" src="${esc(b.src)}" alt="${esc(b.alt || '')}" />`;
+    case 'image': {
+      const src = safeUrl(b.src);
+      return src
+        ? `<img class="block-image" src="${esc(src)}" alt="${esc(b.alt || '')}" />`
+        : '';
+    }
     case 'button':
-      return `<p class="block-button"><a href="${esc(b.href)}">${esc(b.label)}</a></p>`;
+      return `<p class="block-button"><a href="${esc(safeUrl(b.href) || '#')}">${esc(
+        b.label
+      )}</a></p>`;
     case 'divider':
       return `<hr class="block-divider" />`;
     case 'embed':
