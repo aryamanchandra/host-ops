@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from '@/lib/mongodb';
 import { Subdomain } from '@/lib/models';
 import { verifyToken } from '@/lib/auth';
+import { blocksToHtml } from '@/lib/blocks';
 
 // GET specific subdomain
 export async function GET(
@@ -55,17 +56,24 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { title, description, content, customCss, isActive, metadata } = body;
+    const { title, description, content, customCss, isActive, metadata, contentFormat, blocks } = body;
 
     const db = await getDb();
-    
+
     const updateData: Partial<Subdomain> = {
       updatedAt: new Date(),
     };
 
     if (title !== undefined) updateData.title = title;
     if (description !== undefined) updateData.description = description;
-    if (content !== undefined) updateData.content = content;
+    if (contentFormat !== undefined) updateData.contentFormat = contentFormat;
+    if (blocks !== undefined) updateData.blocks = blocks;
+    // Keep the server-derived HTML content in sync with the blocks.
+    if (contentFormat === 'blocks' && Array.isArray(blocks)) {
+      updateData.content = blocksToHtml(blocks);
+    } else if (content !== undefined) {
+      updateData.content = content;
+    }
     if (customCss !== undefined) updateData.customCss = customCss;
     if (isActive !== undefined) updateData.isActive = isActive;
     if (metadata !== undefined) updateData.metadata = metadata;
