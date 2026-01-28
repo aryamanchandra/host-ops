@@ -30,8 +30,11 @@
     "next-auth": "^4.24.11",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
+    "react-markdown": "^10.1.0",
     "react-simple-maps": "^3.0.0",
     "recharts": "^3.2.1",
+    "rehype-sanitize": "^6.0.0",
+    "remark-gfm": "^4.0.1",
     "ua-parser-js": "^2.0.10"
   },
   "devDependencies": {
