@@ -1,0 +1,130 @@
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  border: 1px solid #eaeaea;
+  border-radius: 10px;
+  padding: 12px;
+  background: #fafafa;
+}
+
+.source {
+  width: 100%;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  padding: 12px;
+  font-family: 'SF Mono', Monaco, 'Roboto Mono', Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  resize: vertical;
+  min-height: 280px;
+  box-sizing: border-box;
+}
+
+.previewPane {
+  background: #fff;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  padding: 16px;
+  overflow: auto;
+  min-height: 280px;
+}
+
+@media (max-width: 720px) {
+  .split {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Shared markdown render styles (applied wherever .markdown-body appears) */
+:global(.markdown-body) {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #333;
+}
+
+:global(.markdown-body) h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 24px 0 12px;
+}
+
+:global(.markdown-body) h2 {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 20px 0 10px;
+}
+
+:global(.markdown-body) h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 16px 0 8px;
+}
+
+:global(.markdown-body) p {
+  margin: 12px 0;
+}
+
+:global(.markdown-body) a {
+  color: #0070f3;
+  text-decoration: none;
+}
+
+:global(.markdown-body) code {
+  background: #f5f5f5;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-family: 'SF Mono', Monaco, monospace;
+  font-size: 0.9em;
+}
+
+:global(.markdown-body) pre {
+  background: #000;
+  color: #fff;
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+:global(.markdown-body) pre code {
+  background: none;
+  color: inherit;
+  padding: 0;
+}
+
+:global(.markdown-body) blockquote {
+  border-left: 3px solid #eaeaea;
+  padding-left: 16px;
+  color: #666;
+  margin: 16px 0;
+}
+
+:global(.markdown-body) table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 16px 0;
+}
+
+:global(.markdown-body) th,
+:global(.markdown-body) td {
+  border: 1px solid #eaeaea;
+  padding: 6px 10px;
+  text-align: left;
+}
+
+:global(.markdown-body) img {
+  max-width: 100%;
+  border-radius: 8px;
+}
+
+[data-theme='dark'] .split {
+  background: #0d0d0d;
+  border-color: #333;
+}
+
+[data-theme='dark'] .source,
+[data-theme='dark'] .previewPane {
+  background: #111;
+  border-color: #333;
+  color: #fff;
+}
