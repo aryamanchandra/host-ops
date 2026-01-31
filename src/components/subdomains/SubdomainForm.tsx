@@ -6,6 +6,7 @@ import type { Subdomain } from '@/types';
 import type { Block, ContentFormat } from '@/types/blocks';
 import { legacyHtmlToBlocks } from '@/lib/blocks';
 import BlockEditor from '@/components/subdomains/BlockEditor';
+import MarkdownEditor from '@/components/subdomains/MarkdownEditor';
 
 interface FormData {
   subdomain: string;
@@ -35,8 +36,11 @@ export default function SubdomainForm({
   loading 
 }: Props) {
   const [formData, setFormData] = useState<FormData>(initialData);
-  const [mode, setMode] = useState<'html' | 'blocks'>(
-    (editingSubdomain?.contentFormat as ContentFormat) === 'blocks' ? 'blocks' : 'html'
+  const [mode, setMode] = useState<'html' | 'blocks' | 'markdown'>(
+    editingSubdomain?.contentFormat &&
+      ['html', 'blocks', 'markdown'].includes(editingSubdomain.contentFormat)
+      ? (editingSubdomain.contentFormat as 'html' | 'blocks' | 'markdown')
+      : 'html'
   );
   const [blocks, setBlocks] = useState<Block[]>(
     (editingSubdomain?.blocks as Block[]) || []
@@ -132,6 +136,13 @@ export default function SubdomainForm({
                 </button>
                 <button
                   type="button"
+                  className={mode === 'markdown' ? editorStyles.segActive : editorStyles.seg}
+                  onClick={() => setMode('markdown')}
+                >
+                  Markdown
+                </button>
+                <button
+                  type="button"
                   className={mode === 'blocks' ? editorStyles.segActive : editorStyles.seg}
                   onClick={switchToBlocks}
                 >
@@ -139,7 +150,7 @@ export default function SubdomainForm({
                 </button>
               </div>
             </div>
-            {mode === 'html' ? (
+            {mode === 'html' && (
               <textarea
                 id="content"
                 placeholder="<h1>Welcome!</h1><p>Your content here...</p>"
@@ -148,7 +159,14 @@ export default function SubdomainForm({
                 rows={10}
                 className={styles.textarea}
               />
-            ) : (
+            )}
+            {mode === 'markdown' && (
+              <MarkdownEditor
+                value={formData.content}
+                onChange={(v) => setFormData({ ...formData, content: v })}
+              />
+            )}
+            {mode === 'blocks' && (
               <BlockEditor initialBlocks={blocks} onChange={setBlocks} />
             )}
           </div>
