@@ -1,6 +1,7 @@
 import { Subdomain } from '@/lib/models';
 import { sanitizeHtml } from '@/lib/sanitize';
 import { blocksToHtml } from '@/lib/blocks';
+import MarkdownRenderer from './MarkdownRenderer';
 
 /**
  * Server-rendered presentational markup for a public subdomain page:
@@ -9,6 +10,7 @@ import { blocksToHtml } from '@/lib/blocks';
  * sanitized before injection.
  */
 export default function SubdomainContent({ doc }: { doc: Subdomain }) {
+  const isMarkdown = doc.contentFormat === 'markdown';
   // Prefer rendering from structured blocks; fall back to raw HTML content.
   const rawHtml =
     doc.contentFormat === 'blocks' && doc.blocks?.length
@@ -69,10 +71,16 @@ export default function SubdomainContent({ doc }: { doc: Subdomain }) {
             color: '#333',
           }}
         >
-          <div
-            className="subdomain-content"
-            dangerouslySetInnerHTML={{ __html: safeContent }}
-          />
+          {isMarkdown ? (
+            <div className="subdomain-content">
+              <MarkdownRenderer source={doc.content || ''} />
+            </div>
+          ) : (
+            <div
+              className="subdomain-content"
+              dangerouslySetInnerHTML={{ __html: safeContent }}
+            />
+          )}
         </main>
 
         <footer
