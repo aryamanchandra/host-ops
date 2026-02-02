@@ -3,6 +3,7 @@ import { getDb } from '@/lib/mongodb';
 import { Subdomain } from '@/lib/models';
 import { requireAuth, resolveOrgId } from '@/lib/api-auth';
 import { blocksToHtml } from '@/lib/blocks';
+import { normalizeContentFormat } from '@/lib/markdown';
 
 // GET all subdomains for authenticated user
 export async function GET(request: NextRequest) {
@@ -48,7 +49,7 @@ export async function POST(request: NextRequest) {
     const { subdomain, title, description, content, customCss, metadata, blocks } = body;
 
     // When authored as blocks, the server derives the canonical HTML content.
-    const contentFormat = body.contentFormat || 'html';
+    const contentFormat = normalizeContentFormat(body.contentFormat);
     const finalContent =
       contentFormat === 'blocks' && Array.isArray(blocks)
         ? blocksToHtml(blocks)

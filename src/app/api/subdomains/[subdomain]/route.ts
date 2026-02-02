@@ -3,6 +3,7 @@ import { getDb } from '@/lib/mongodb';
 import { Subdomain } from '@/lib/models';
 import { verifyToken } from '@/lib/auth';
 import { blocksToHtml } from '@/lib/blocks';
+import { normalizeContentFormat } from '@/lib/markdown';
 
 // GET specific subdomain
 export async function GET(
@@ -66,7 +67,7 @@ export async function PUT(
 
     if (title !== undefined) updateData.title = title;
     if (description !== undefined) updateData.description = description;
-    if (contentFormat !== undefined) updateData.contentFormat = contentFormat;
+    if (contentFormat !== undefined) updateData.contentFormat = normalizeContentFormat(contentFormat);
     if (blocks !== undefined) updateData.blocks = blocks;
     // Keep the server-derived HTML content in sync with the blocks.
     if (contentFormat === 'blocks' && Array.isArray(blocks)) {
