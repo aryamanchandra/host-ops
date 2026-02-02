@@ -10,10 +10,12 @@ import MarkdownRenderer from './MarkdownRenderer';
  * sanitized before injection.
  */
 export default function SubdomainContent({ doc }: { doc: Subdomain }) {
-  const isMarkdown = doc.contentFormat === 'markdown';
+  // Legacy subdomains predate contentFormat — treat them as raw HTML.
+  const format = doc.contentFormat || 'html';
+  const isMarkdown = format === 'markdown';
   // Prefer rendering from structured blocks; fall back to raw HTML content.
   const rawHtml =
-    doc.contentFormat === 'blocks' && doc.blocks?.length
+    format === 'blocks' && doc.blocks?.length
       ? blocksToHtml(doc.blocks)
       : doc.content || '';
   const safeContent = sanitizeHtml(rawHtml);
