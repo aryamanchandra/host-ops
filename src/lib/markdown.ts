@@ -8,11 +8,21 @@ import type { ContentFormat } from '@/types/blocks';
  */
 export const markdownSanitizeSchema = {
   ...defaultSchema,
-  tagNames: [...(defaultSchema.tagNames || [])],
+  // Never allow <script> in rendered markdown.
+  tagNames: (defaultSchema.tagNames || []).filter((t) => t !== 'script'),
   attributes: {
     ...defaultSchema.attributes,
   },
+  // Strip inline event-handler attributes (onclick, onerror, …) and
+  // javascript: URLs via the default protocol allowlist.
+  clobber: [],
+  clobberPrefix: 'user-content-',
 };
+
+// Defensive secondary pass: drop any on* attribute that slips through.
+export function stripEventHandlers(html: string): string {
+  return html.replace(/\son[a-z]+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, '');
+}
 
 export function isMarkdown(format?: ContentFormat | string): boolean {
   return format === 'markdown';
