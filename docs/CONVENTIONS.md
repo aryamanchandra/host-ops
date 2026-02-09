@@ -27,6 +27,14 @@ if (auth instanceof NextResponse) return auth;
 - Any author- or visitor-supplied HTML rendered to the DOM MUST pass through `sanitizeHtml` from [../src/lib/sanitize.ts](../src/lib/sanitize.ts) — on both server and client.
 - Applies to: subdomain content, page-builder blocks, markdown output, form field rendering.
 
+## Content authoring (HTML / Markdown / Blocks)
+
+- A subdomain's `contentFormat` is one of `html | markdown | blocks` (legacy docs default to `html`).
+- **Markdown:** `content` holds the markdown source; rendered via `MarkdownRenderer` (react-markdown + remark-gfm + rehype-sanitize). The sanitize allowlist lives in [../src/lib/markdown.ts](../src/lib/markdown.ts) — `<script>` and `on*` handlers are stripped.
+- **Blocks:** structured `blocks[]` are serialized to HTML server-side (`blocksToHtml`) and stored in `content`; text/embed blocks are sanitized and image/button URLs validated.
+- **HTML:** raw `content` sanitized via `sanitizeHtml` before render.
+- The public `SubdomainContent` picks the render path from `contentFormat`.
+
 ## Public endpoints
 
 - Public write endpoints (`/api/analytics/track`, `/api/links/redirect/[slug]`, future form submissions) must pass through `rateLimit` from [../src/lib/rate-limit.ts](../src/lib/rate-limit.ts).
