@@ -9,6 +9,17 @@ export interface Subdomain {
   contentFormat?: ContentFormat; // how `content` was authored
   blocks?: Block[]; // structured blocks when contentFormat === 'blocks'
   customCss?: string;
+  status?: 'draft' | 'published'; // editing lifecycle
+  version?: number; // increments on each saved edit
+  publishedContent?: {
+    title: string;
+    description: string;
+    content: string;
+    customCss?: string;
+    contentFormat?: ContentFormat;
+    blocks?: Block[];
+    publishedAt: Date;
+  };
   userId: string; // User who created this subdomain (attribution)
   orgId?: string; // Owning organization (multi-tenant scoping)
   createdAt: Date;
