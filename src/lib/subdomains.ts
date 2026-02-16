@@ -29,7 +29,25 @@ export const getSubdomainBySlug = cache(
   async (slug: string): Promise<Subdomain | null> => {
     const db = await getDb();
     await ensureSubdomainIndexes(db);
-    const doc = await db.collection('subdomains').findOne({ subdomain: slug });
-    return doc as Subdomain | null;
+    const doc = (await db
+      .collection('subdomains')
+      .findOne({ subdomain: slug })) as Subdomain | null;
+    if (!doc) return null;
+
+    // Public visitors see the published snapshot; legacy docs without one
+    // fall back to their live content.
+    if (doc.publishedContent) {
+      const p = doc.publishedContent;
+      return {
+        ...doc,
+        title: p.title,
+        description: p.description,
+        content: p.content,
+        customCss: p.customCss,
+        contentFormat: p.contentFormat,
+        blocks: p.blocks,
+      };
+    }
+    return doc;
   }
 );
