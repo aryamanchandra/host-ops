@@ -4,6 +4,7 @@ import { Subdomain } from '@/lib/models';
 import { verifyToken } from '@/lib/auth';
 import { blocksToHtml } from '@/lib/blocks';
 import { normalizeContentFormat } from '@/lib/markdown';
+import { snapshotVersion } from '@/lib/versions';
 
 // GET specific subdomain
 export async function GET(
@@ -78,6 +79,20 @@ export async function PUT(
     if (customCss !== undefined) updateData.customCss = customCss;
     if (isActive !== undefined) updateData.isActive = isActive;
     if (metadata !== undefined) updateData.metadata = metadata;
+
+    // Snapshot the current state into version history and mark the edit as a
+    // draft (the published page keeps serving publishedContent until publish).
+    const current = await db
+      .collection<Subdomain>('subdomains')
+      .findOne({ subdomain: params.subdomain, userId: decoded.userId });
+    if (current) {
+      await snapshotVersion(current, 'edit', {
+        id: decoded.userId,
+        name: decoded.username,
+      });
+      updateData.status = 'draft';
+      updateData.version = (current.version || 1) + 1;
+    }
 
     const result = await db.collection('subdomains').findOneAndUpdate(
       { subdomain: params.subdomain, userId: decoded.userId },
