@@ -1,10 +1,17 @@
 'use client';
 
 import { useState } from 'react';
+import { diffLines } from 'diff';
 import { X, RotateCcw } from 'lucide-react';
 import { useVersions } from '@/hooks';
 import type { VersionView } from '@/types';
 import styles from '@/styles/VersionHistory.module.css';
+
+function previewDoc(v: VersionView): string {
+  return `<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{font-family:-apple-system,sans-serif;max-width:680px;margin:0 auto;padding:24px;line-height:1.6;color:#333}${
+    v.customCss || ''
+  }</style></head><body>${v.content || ''}</body></html>`;
+}
 
 export default function VersionHistoryModal({
   token,
@@ -92,6 +99,37 @@ export default function VersionHistoryModal({
               ))
             )}
           </div>
+
+          {selected && (
+            <div className={styles.pane}>
+              <div className={styles.paneLabel}>Preview · v{selected.version}</div>
+              <iframe
+                className={styles.preview}
+                sandbox=""
+                srcDoc={previewDoc(selected)}
+                title={`Version ${selected.version} preview`}
+              />
+              <div className={styles.paneLabel}>Changes vs latest</div>
+              <div className={styles.diff}>
+                {diffLines(versions[0]?.content || '', selected.content || '').map(
+                  (part, i) => (
+                    <pre
+                      key={i}
+                      className={
+                        part.added
+                          ? styles.added
+                          : part.removed
+                          ? styles.removed
+                          : styles.ctx
+                      }
+                    >
+                      {part.value}
+                    </pre>
+                  )
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
