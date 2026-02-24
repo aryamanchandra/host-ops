@@ -8,4 +8,5 @@ export * from './useOrg';
 export * from './useOrgMembers';
 export * from './useTemplates';
 export * from './useDebouncedValue';
+export * from './useVersions';
 
