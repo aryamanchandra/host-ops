@@ -1,5 +1,6 @@
-import { Edit2, Trash2, ExternalLink, BarChart3, CheckCircle, XCircle } from 'lucide-react';
+import { Edit2, Trash2, ExternalLink, BarChart3, History } from 'lucide-react';
 import styles from '@/styles/page.module.css';
+import versionStyles from '@/styles/VersionHistory.module.css';
 import type { Subdomain } from '@/types';
 
 const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN!;
@@ -9,9 +10,11 @@ interface Props {
   onEdit: (subdomain: Subdomain) => void;
   onDelete: (subdomain: string, title: string) => void;
   onViewAnalytics: (subdomain: string) => void;
+  onHistory?: (subdomain: string) => void;
 }
 
-export default function SubdomainCard({ subdomain, onEdit, onDelete, onViewAnalytics }: Props) {
+export default function SubdomainCard({ subdomain, onEdit, onDelete, onViewAnalytics, onHistory }: Props) {
+  const status = subdomain.status || 'published';
   return (
     <div className={styles.subdomainCard}>
       <div className={styles.cardContent}>
@@ -19,7 +22,11 @@ export default function SubdomainCard({ subdomain, onEdit, onDelete, onViewAnaly
         <div className={styles.cardInfo}>
           <div className={styles.cardTitleRow}>
             <h3 className={styles.cardTitle}>{subdomain.title}</h3>
-            <span className={styles.statusDot} data-active={subdomain.isActive} />
+            <span
+              className={status === 'draft' ? versionStyles.badgeDraft : versionStyles.badgePublished}
+            >
+              {status}
+            </span>
           </div>
           <a
             href={`http://${subdomain.subdomain}.${ROOT_DOMAIN}`}
@@ -44,6 +51,18 @@ export default function SubdomainCard({ subdomain, onEdit, onDelete, onViewAnaly
           >
             <BarChart3 size={14} />
           </button>
+          {onHistory && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onHistory(subdomain.subdomain);
+              }}
+              className={styles.actionBtn}
+              title="Version history"
+            >
+              <History size={14} />
+            </button>
+          )}
           <button
             onClick={(e) => {
               e.stopPropagation();

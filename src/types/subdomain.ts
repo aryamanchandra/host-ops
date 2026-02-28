@@ -19,6 +19,8 @@ export interface Subdomain {
   blocks?: Block[];
   customCss?: string;
   isActive: boolean;
+  status?: 'draft' | 'published';
+  version?: number;
   metadata?: SubdomainMetadata;
 }
 

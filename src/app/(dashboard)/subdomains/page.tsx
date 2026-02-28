@@ -9,6 +9,7 @@ import { useAuth, useSubdomains } from '@/hooks';
 import SubdomainCard from '@/components/subdomains/SubdomainCard';
 import SubdomainForm from '@/components/subdomains/SubdomainForm';
 import DeleteConfirmModal from '@/components/common/DeleteConfirmModal';
+import VersionHistoryModal from '@/components/subdomains/VersionHistoryModal';
 
 export default function SubdomainsPage() {
   const router = useRouter();
@@ -20,6 +21,7 @@ export default function SubdomainsPage() {
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState<{ subdomain: string; title: string } | null>(null);
+  const [historyFor, setHistoryFor] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     subdomain: '',
@@ -158,9 +160,19 @@ export default function SubdomainsPage() {
               onEdit={handleEdit}
               onDelete={(sub, title) => setDeleteConfirm({ subdomain: sub, title })}
               onViewAnalytics={(sub) => router.push(`/analytics/${sub}`)}
+              onHistory={(sub) => setHistoryFor(sub)}
             />
           ))}
         </div>
+      )}
+
+      {historyFor && (
+        <VersionHistoryModal
+          token={token}
+          subdomain={historyFor}
+          onClose={() => setHistoryFor(null)}
+          onChanged={refetch}
+        />
       )}
 
       {showCreateForm && (
