@@ -86,12 +86,19 @@ export async function PUT(
       .collection<Subdomain>('subdomains')
       .findOne({ subdomain: params.subdomain, userId: decoded.userId });
     if (current) {
-      await snapshotVersion(current, 'edit', {
-        id: decoded.userId,
-        name: decoded.username,
-      });
-      updateData.status = 'draft';
-      updateData.version = (current.version || 1) + 1;
+      const changed =
+        (updateData.content !== undefined && updateData.content !== current.content) ||
+        (updateData.title !== undefined && updateData.title !== current.title) ||
+        (updateData.description !== undefined && updateData.description !== current.description) ||
+        (updateData.customCss !== undefined && updateData.customCss !== current.customCss);
+      if (changed) {
+        await snapshotVersion(current, 'edit', {
+          id: decoded.userId,
+          name: decoded.username,
+        });
+        updateData.status = 'draft';
+        updateData.version = (current.version || 1) + 1;
+      }
     }
 
     const result = await db.collection('subdomains').findOneAndUpdate(
