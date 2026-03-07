@@ -25,6 +25,18 @@ export async function POST(
     return NextResponse.json({ error: 'Version not found' }, { status: 404 });
   }
 
+  // Backfill status/version on legacy docs so the snapshot + increment work.
+  if (current.version === undefined || current.status === undefined) {
+    current.version = current.version || 1;
+    current.status = current.status || 'published';
+    await db
+      .collection('subdomains')
+      .updateOne(
+        { subdomain: params.subdomain, userId: auth.userId },
+        { $set: { status: current.status, version: current.version } }
+      );
+  }
+
   // Snapshot the current state, then overwrite with the restored version.
   await snapshotVersion(current, 'restore', { id: auth.userId, name: auth.username });
   await db.collection('subdomains').updateOne(
