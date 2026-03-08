@@ -35,6 +35,13 @@ if (auth instanceof NextResponse) return auth;
 - **HTML:** raw `content` sanitized via `sanitizeHtml` before render.
 - The public `SubdomainContent` picks the render path from `contentFormat`.
 
+## Content versioning & publishing
+
+- Each subdomain has a `status` (`draft | published`), a `version` counter, and a `publishedContent` snapshot.
+- **Public visitors always see `publishedContent`** (via `getSubdomainBySlug`); legacy docs without it fall back to live `content`.
+- Saving an edit snapshots the prior state into `subdomain_versions` and marks the subdomain a **draft** (unchanged saves are skipped). Publishing copies the current draft into `publishedContent`.
+- History/restore: `GET /api/subdomains/[s]/versions`, `POST …/versions/[v]/restore`, `POST …/publish`. UI: `VersionHistoryModal` (jsdiff viewer + sandboxed preview). Only the newest 50 versions are kept (`pruneVersions`).
+
 ## Public endpoints
 
 - Public write endpoints (`/api/analytics/track`, `/api/links/redirect/[slug]`, future form submissions) must pass through `rateLimit` from [../src/lib/rate-limit.ts](../src/lib/rate-limit.ts).
