@@ -5,6 +5,7 @@ import { verifyToken } from '@/lib/auth';
 import { blocksToHtml } from '@/lib/blocks';
 import { normalizeContentFormat } from '@/lib/markdown';
 import { snapshotVersion } from '@/lib/versions';
+import { validateWindow } from '@/lib/schedule';
 
 // GET specific subdomain
 export async function GET(
@@ -79,6 +80,19 @@ export async function PUT(
     if (customCss !== undefined) updateData.customCss = customCss;
     if (isActive !== undefined) updateData.isActive = isActive;
     if (metadata !== undefined) updateData.metadata = metadata;
+
+    if (body.publishAt !== undefined || body.unpublishAt !== undefined) {
+      const windowError = validateWindow(body.publishAt, body.unpublishAt);
+      if (windowError) {
+        return NextResponse.json({ error: windowError }, { status: 400 });
+      }
+      if (body.publishAt !== undefined) {
+        updateData.publishAt = body.publishAt ? new Date(body.publishAt) : null;
+      }
+      if (body.unpublishAt !== undefined) {
+        updateData.unpublishAt = body.unpublishAt ? new Date(body.unpublishAt) : null;
+      }
+    }
 
     // Snapshot the current state into version history and mark the edit as a
     // draft (the published page keeps serving publishedContent until publish).

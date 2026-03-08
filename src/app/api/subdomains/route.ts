@@ -4,6 +4,7 @@ import { Subdomain } from '@/lib/models';
 import { requireAuth, resolveOrgId } from '@/lib/api-auth';
 import { blocksToHtml } from '@/lib/blocks';
 import { normalizeContentFormat } from '@/lib/markdown';
+import { validateWindow } from '@/lib/schedule';
 
 // GET all subdomains for authenticated user
 export async function GET(request: NextRequest) {
@@ -55,6 +56,12 @@ export async function POST(request: NextRequest) {
         ? blocksToHtml(blocks)
         : content || '';
 
+    // Optional scheduled publish window.
+    const windowError = validateWindow(body.publishAt, body.unpublishAt);
+    if (windowError) {
+      return NextResponse.json({ error: windowError }, { status: 400 });
+    }
+
     if (!subdomain || !title) {
       return NextResponse.json(
         { error: 'Subdomain and title are required' },
@@ -92,6 +99,8 @@ export async function POST(request: NextRequest) {
       customCss: customCss || '',
       userId: auth.userId,
       orgId: orgId || undefined,
+      publishAt: body.publishAt ? new Date(body.publishAt) : null,
+      unpublishAt: body.unpublishAt ? new Date(body.unpublishAt) : null,
       createdAt: new Date(),
       updatedAt: new Date(),
       isActive: true,
