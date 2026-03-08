@@ -25,6 +25,9 @@ export interface Subdomain {
   createdAt: Date;
   updatedAt: Date;
   isActive: boolean;
+  publishAt?: Date | null; // go live at this time
+  unpublishAt?: Date | null; // take down at this time
+  lastScheduledFlipAt?: Date; // when the scheduler last flipped isActive
   metadata?: {
     author?: string;
     tags?: string[];

@@ -21,6 +21,8 @@ export interface Subdomain {
   isActive: boolean;
   status?: 'draft' | 'published';
   version?: number;
+  publishAt?: string | null;
+  unpublishAt?: string | null;
   metadata?: SubdomainMetadata;
 }
 
