@@ -5,7 +5,7 @@ import { verifyToken } from '@/lib/auth';
 import { blocksToHtml } from '@/lib/blocks';
 import { normalizeContentFormat } from '@/lib/markdown';
 import { snapshotVersion } from '@/lib/versions';
-import { validateWindow } from '@/lib/schedule';
+import { validateWindow, isWithinWindow } from '@/lib/schedule';
 
 // GET specific subdomain
 export async function GET(
@@ -18,7 +18,7 @@ export async function GET(
       .collection<Subdomain>('subdomains')
       .findOne({ subdomain: params.subdomain });
 
-    if (!subdomain) {
+    if (!subdomain || !isWithinWindow(subdomain)) {
       return NextResponse.json(
         { error: 'Subdomain not found' },
         { status: 404 }
