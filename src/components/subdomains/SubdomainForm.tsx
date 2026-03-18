@@ -7,6 +7,7 @@ import type { Block, ContentFormat } from '@/types/blocks';
 import { legacyHtmlToBlocks } from '@/lib/blocks';
 import BlockEditor from '@/components/subdomains/BlockEditor';
 import MarkdownEditor from '@/components/subdomains/MarkdownEditor';
+import ScheduleFields from '@/components/subdomains/ScheduleFields';
 
 interface FormData {
   subdomain: string;
@@ -16,7 +17,12 @@ interface FormData {
   customCss: string;
   contentFormat?: ContentFormat;
   blocks?: Block[];
+  publishAt?: string | null;
+  unpublishAt?: string | null;
 }
+
+const toLocalInput = (v?: string | null) =>
+  v ? new Date(v).toISOString().slice(0, 16) : '';
 
 interface Props {
   editingSubdomain: Subdomain | null;
@@ -45,6 +51,10 @@ export default function SubdomainForm({
   const [blocks, setBlocks] = useState<Block[]>(
     (editingSubdomain?.blocks as Block[]) || []
   );
+  const [publishAt, setPublishAt] = useState(toLocalInput(editingSubdomain?.publishAt));
+  const [unpublishAt, setUnpublishAt] = useState(
+    toLocalInput(editingSubdomain?.unpublishAt)
+  );
 
   const switchToBlocks = () => {
     // Legacy convert: seed from existing HTML content if there are no blocks.
@@ -60,6 +70,8 @@ export default function SubdomainForm({
       ...formData,
       contentFormat: mode,
       blocks: mode === 'blocks' ? blocks : [],
+      publishAt: publishAt || null,
+      unpublishAt: unpublishAt || null,
     });
   };
 
@@ -182,6 +194,15 @@ export default function SubdomainForm({
               className={styles.textarea}
             />
           </div>
+
+          <ScheduleFields
+            publishAt={publishAt}
+            unpublishAt={unpublishAt}
+            onChange={(patch) => {
+              if (patch.publishAt !== undefined) setPublishAt(patch.publishAt);
+              if (patch.unpublishAt !== undefined) setUnpublishAt(patch.unpublishAt);
+            }}
+          />
 
           <div className={styles.modalActions}>
             <button type="button" onClick={onClose} className={styles.cancelButton}>
