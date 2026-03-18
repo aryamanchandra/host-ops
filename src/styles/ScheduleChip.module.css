@@ -1,0 +1,66 @@
+.chipDraft,
+.chipScheduled,
+.chipLive,
+.chipEnded {
+  font-size: 11px;
+  text-transform: capitalize;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-weight: 600;
+}
+
+.chipDraft {
+  background: #f1f1f1;
+  color: #666;
+}
+
+.chipScheduled {
+  background: #fff4e5;
+  color: #b25e09;
+}
+
+.chipLive {
+  background: #e6ffed;
+  color: #0a7f3f;
+}
+
+.chipEnded {
+  background: #ffe9ec;
+  color: #c0263b;
+}
+
+/* ScheduleFields (in the subdomain form) */
+.fields {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: #666;
+  flex: 1;
+  min-width: 180px;
+}
+
+.field input {
+  padding: 8px 10px;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+[data-theme='dark'] .chipDraft {
+  background: #1f1f1f;
+  color: #aaa;
+}
+
+[data-theme='dark'] .field input {
+  background: #1a1a1a;
+  border-color: #333;
+  color: #fff;
+}
