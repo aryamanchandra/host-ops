@@ -1,7 +1,9 @@
 import { Edit2, Trash2, ExternalLink, BarChart3, History } from 'lucide-react';
 import styles from '@/styles/page.module.css';
 import versionStyles from '@/styles/VersionHistory.module.css';
+import scheduleStyles from '@/styles/ScheduleChip.module.css';
 import type { Subdomain } from '@/types';
+import { effectiveStatus } from '@/lib/schedule';
 
 const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN!;
 
@@ -15,6 +17,13 @@ interface Props {
 
 export default function SubdomainCard({ subdomain, onEdit, onDelete, onViewAnalytics, onHistory }: Props) {
   const status = subdomain.status || 'published';
+  const sched = effectiveStatus(subdomain);
+  const schedClass: Record<string, string> = {
+    draft: scheduleStyles.chipDraft,
+    scheduled: scheduleStyles.chipScheduled,
+    live: scheduleStyles.chipLive,
+    ended: scheduleStyles.chipEnded,
+  };
   return (
     <div className={styles.subdomainCard}>
       <div className={styles.cardContent}>
@@ -27,6 +36,7 @@ export default function SubdomainCard({ subdomain, onEdit, onDelete, onViewAnaly
             >
               {status}
             </span>
+            <span className={schedClass[sched]}>{sched}</span>
           </div>
           <a
             href={`http://${subdomain.subdomain}.${ROOT_DOMAIN}`}
