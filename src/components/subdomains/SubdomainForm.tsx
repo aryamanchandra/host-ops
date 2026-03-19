@@ -21,8 +21,16 @@ interface FormData {
   unpublishAt?: string | null;
 }
 
-const toLocalInput = (v?: string | null) =>
-  v ? new Date(v).toISOString().slice(0, 16) : '';
+// Convert a stored ISO/UTC timestamp to a local `datetime-local` value
+// (and back on submit) without timezone drift.
+const toLocalInput = (v?: string | null) => {
+  if (!v) return '';
+  const d = new Date(v);
+  const offsetMs = d.getTimezoneOffset() * 60000;
+  return new Date(d.getTime() - offsetMs).toISOString().slice(0, 16);
+};
+
+const fromLocalInput = (v: string) => (v ? new Date(v).toISOString() : null);
 
 interface Props {
   editingSubdomain: Subdomain | null;
@@ -70,8 +78,8 @@ export default function SubdomainForm({
       ...formData,
       contentFormat: mode,
       blocks: mode === 'blocks' ? blocks : [],
-      publishAt: publishAt || null,
-      unpublishAt: unpublishAt || null,
+      publishAt: fromLocalInput(publishAt),
+      unpublishAt: fromLocalInput(unpublishAt),
     });
   };
 
