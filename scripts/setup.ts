@@ -38,6 +38,14 @@ async function ensureIndexes() {
   await db.collection('subdomains').createIndex({ subdomain: 1 }, { unique: true });
   await db.collection('subdomains').createIndex({ userId: 1, createdAt: -1 });
 
+  // subdomains: scheduled-publish cron scans by isActive + boundary times
+  await db
+    .collection('subdomains')
+    .createIndex({ isActive: 1, publishAt: 1 }, { partialFilterExpression: { publishAt: { $exists: true } } });
+  await db
+    .collection('subdomains')
+    .createIndex({ isActive: 1, unpublishAt: 1 }, { partialFilterExpression: { unpublishAt: { $exists: true } } });
+
   // multi-tenant: organizations, members, invites
   await db.collection('organizations').createIndex({ slug: 1 }, { unique: true });
   await db.collection('org_members').createIndex({ orgId: 1, userId: 1 }, { unique: true });
