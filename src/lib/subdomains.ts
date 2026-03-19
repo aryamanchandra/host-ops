@@ -2,6 +2,7 @@ import { cache } from 'react';
 import type { Db } from 'mongodb';
 import { getDb } from './mongodb';
 import { Subdomain } from './models';
+import { isWithinWindow } from './schedule';
 
 let indexesEnsured = false;
 
@@ -33,6 +34,9 @@ export const getSubdomainBySlug = cache(
       .collection('subdomains')
       .findOne({ subdomain: slug })) as Subdomain | null;
     if (!doc) return null;
+
+    // Respect the scheduled publish window for public visitors.
+    if (!isWithinWindow(doc)) return null;
 
     // Public visitors see the published snapshot; legacy docs without one
     // fall back to their live content.
