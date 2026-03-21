@@ -25,6 +25,9 @@ export interface Subdomain {
   createdAt: Date;
   updatedAt: Date;
   isActive: boolean;
+  type?: 'page' | 'redirect'; // page hosts content; redirect bounces elsewhere
+  redirectUrl?: string; // destination when type === 'redirect'
+  redirectType?: 301 | 302; // permanent or temporary
   publishAt?: Date | null; // go live at this time
   unpublishAt?: Date | null; // take down at this time
   lastScheduledFlipAt?: Date; // when the scheduler last flipped isActive

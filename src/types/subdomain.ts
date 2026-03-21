@@ -19,6 +19,9 @@ export interface Subdomain {
   blocks?: Block[];
   customCss?: string;
   isActive: boolean;
+  type?: 'page' | 'redirect';
+  redirectUrl?: string;
+  redirectType?: 301 | 302;
   status?: 'draft' | 'published';
   version?: number;
   publishAt?: string | null;
