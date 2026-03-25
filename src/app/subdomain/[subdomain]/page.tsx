@@ -2,8 +2,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getSubdomainBySlug } from '@/lib/subdomains';
 import { buildSubdomainMetadata } from '@/helpers/metadata';
-import SubdomainContent from '@/components/subdomains/SubdomainContent';
-import AnalyticsTracker from '@/components/subdomains/AnalyticsTracker';
+import SubdomainView from '@/components/subdomains/SubdomainView';
 
 // Render per-request so freshly edited subdomains reflect immediately
 // without a redeploy or cache revalidation window.
@@ -32,10 +31,5 @@ export default async function SubdomainPage({
     notFound();
   }
 
-  return (
-    <>
-      <SubdomainContent doc={doc} />
-      <AnalyticsTracker subdomain={params.subdomain} />
-    </>
-  );
+  return <SubdomainView doc={doc} />;
 }
