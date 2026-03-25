@@ -6,6 +6,7 @@ import { blocksToHtml } from '@/lib/blocks';
 import { normalizeContentFormat } from '@/lib/markdown';
 import { snapshotVersion } from '@/lib/versions';
 import { validateWindow, isWithinWindow } from '@/lib/schedule';
+import { validateRedirect, normalizeRedirectType } from '@/lib/redirect';
 
 // GET specific subdomain
 export async function GET(
@@ -80,6 +81,23 @@ export async function PUT(
     if (customCss !== undefined) updateData.customCss = customCss;
     if (isActive !== undefined) updateData.isActive = isActive;
     if (metadata !== undefined) updateData.metadata = metadata;
+
+    if (body.type !== undefined) {
+      const redirectError = validateRedirect(
+        body.type,
+        body.redirectUrl,
+        params.subdomain,
+        process.env.NEXT_PUBLIC_ROOT_DOMAIN
+      );
+      if (redirectError) {
+        return NextResponse.json({ error: redirectError }, { status: 400 });
+      }
+      updateData.type = body.type === 'redirect' ? 'redirect' : 'page';
+      updateData.redirectUrl = body.type === 'redirect' ? body.redirectUrl : undefined;
+      if (body.redirectType !== undefined) {
+        updateData.redirectType = normalizeRedirectType(body.redirectType);
+      }
+    }
 
     if (body.publishAt !== undefined || body.unpublishAt !== undefined) {
       const windowError = validateWindow(body.publishAt, body.unpublishAt);
