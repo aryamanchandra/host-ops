@@ -1,7 +1,8 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect, permanentRedirect } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getSubdomainBySlug } from '@/lib/subdomains';
 import { buildSubdomainMetadata } from '@/helpers/metadata';
+import { isRedirect } from '@/lib/redirect';
 import SubdomainView from '@/components/subdomains/SubdomainView';
 
 // Render per-request so freshly edited subdomains reflect immediately
@@ -29,6 +30,12 @@ export default async function SubdomainPage({
 
   if (!doc || !doc.isActive) {
     notFound();
+  }
+
+  // Redirect-type subdomains bounce to their destination (301 or 302).
+  if (isRedirect(doc) && doc.redirectUrl) {
+    if (doc.redirectType === 301) permanentRedirect(doc.redirectUrl);
+    redirect(doc.redirectUrl);
   }
 
   return <SubdomainView doc={doc} />;
