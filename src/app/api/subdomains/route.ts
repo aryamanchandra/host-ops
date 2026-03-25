@@ -5,6 +5,7 @@ import { requireAuth, resolveOrgId } from '@/lib/api-auth';
 import { blocksToHtml } from '@/lib/blocks';
 import { normalizeContentFormat } from '@/lib/markdown';
 import { validateWindow } from '@/lib/schedule';
+import { validateRedirect, normalizeRedirectType } from '@/lib/redirect';
 
 // GET all subdomains for authenticated user
 export async function GET(request: NextRequest) {
@@ -62,6 +63,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: windowError }, { status: 400 });
     }
 
+    const redirectError = validateRedirect(
+      body.type,
+      body.redirectUrl,
+      subdomain,
+      process.env.NEXT_PUBLIC_ROOT_DOMAIN
+    );
+    if (redirectError) {
+      return NextResponse.json({ error: redirectError }, { status: 400 });
+    }
+
     if (!subdomain || !title) {
       return NextResponse.json(
         { error: 'Subdomain and title are required' },
@@ -101,6 +112,9 @@ export async function POST(request: NextRequest) {
       orgId: orgId || undefined,
       publishAt: body.publishAt ? new Date(body.publishAt) : null,
       unpublishAt: body.unpublishAt ? new Date(body.unpublishAt) : null,
+      type: body.type === 'redirect' ? 'redirect' : 'page',
+      redirectUrl: body.type === 'redirect' ? body.redirectUrl : undefined,
+      redirectType: normalizeRedirectType(body.redirectType),
       createdAt: new Date(),
       updatedAt: new Date(),
       isActive: true,
