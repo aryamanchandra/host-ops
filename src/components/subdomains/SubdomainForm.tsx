@@ -19,6 +19,9 @@ interface FormData {
   blocks?: Block[];
   publishAt?: string | null;
   unpublishAt?: string | null;
+  type?: 'page' | 'redirect';
+  redirectUrl?: string;
+  redirectType?: 301 | 302;
 }
 
 // Convert a stored ISO/UTC timestamp to a local `datetime-local` value
@@ -63,6 +66,13 @@ export default function SubdomainForm({
   const [unpublishAt, setUnpublishAt] = useState(
     toLocalInput(editingSubdomain?.unpublishAt)
   );
+  const [pageType, setPageType] = useState<'page' | 'redirect'>(
+    editingSubdomain?.type === 'redirect' ? 'redirect' : 'page'
+  );
+  const [redirectUrl, setRedirectUrl] = useState(editingSubdomain?.redirectUrl || '');
+  const [redirectType, setRedirectType] = useState<301 | 302>(
+    (editingSubdomain?.redirectType as 301 | 302) || 302
+  );
 
   const switchToBlocks = () => {
     // Legacy convert: seed from existing HTML content if there are no blocks.
@@ -80,6 +90,9 @@ export default function SubdomainForm({
       blocks: mode === 'blocks' ? blocks : [],
       publishAt: fromLocalInput(publishAt),
       unpublishAt: fromLocalInput(unpublishAt),
+      type: pageType,
+      redirectUrl: pageType === 'redirect' ? redirectUrl : undefined,
+      redirectType,
     });
   };
 
@@ -145,6 +158,52 @@ export default function SubdomainForm({
 
           <div className={styles.formGroup}>
             <div className={editorStyles.modeToggle}>
+              <label>Type</label>
+              <div className={editorStyles.segmented}>
+                <button
+                  type="button"
+                  className={pageType === 'page' ? editorStyles.segActive : editorStyles.seg}
+                  onClick={() => setPageType('page')}
+                >
+                  Page
+                </button>
+                <button
+                  type="button"
+                  className={pageType === 'redirect' ? editorStyles.segActive : editorStyles.seg}
+                  onClick={() => setPageType('redirect')}
+                >
+                  Redirect
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {pageType === 'redirect' && (
+            <div className={styles.formGroup}>
+              <label htmlFor="redirectUrl">Destination URL *</label>
+              <input
+                id="redirectUrl"
+                type="url"
+                placeholder="https://example.com"
+                value={redirectUrl}
+                onChange={(e) => setRedirectUrl(e.target.value)}
+                className={styles.input}
+                required
+              />
+              <select
+                value={redirectType}
+                onChange={(e) => setRedirectType(Number(e.target.value) as 301 | 302)}
+                className={styles.input}
+              >
+                <option value={302}>302 — Temporary</option>
+                <option value={301}>301 — Permanent</option>
+              </select>
+            </div>
+          )}
+
+          {pageType === 'page' && (
+          <div className={styles.formGroup}>
+            <div className={editorStyles.modeToggle}>
               <label>Content</label>
               <div className={editorStyles.segmented}>
                 <button
@@ -190,6 +249,7 @@ export default function SubdomainForm({
               <BlockEditor initialBlocks={blocks} onChange={setBlocks} />
             )}
           </div>
+          )}
 
           <div className={styles.formGroup}>
             <label htmlFor="customCss">Custom CSS (Optional)</label>
