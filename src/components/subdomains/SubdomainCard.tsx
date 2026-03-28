@@ -2,6 +2,7 @@ import { Edit2, Trash2, ExternalLink, BarChart3, History } from 'lucide-react';
 import styles from '@/styles/page.module.css';
 import versionStyles from '@/styles/VersionHistory.module.css';
 import scheduleStyles from '@/styles/ScheduleChip.module.css';
+import redirectStyles from '@/styles/Redirect.module.css';
 import type { Subdomain } from '@/types';
 import { effectiveStatus } from '@/lib/schedule';
 
@@ -37,6 +38,9 @@ export default function SubdomainCard({ subdomain, onEdit, onDelete, onViewAnaly
               {status}
             </span>
             <span className={schedClass[sched]}>{sched}</span>
+            {subdomain.type === 'redirect' && (
+              <span className={redirectStyles.badgeRedirect}>redirect</span>
+            )}
           </div>
           <a
             href={`http://${subdomain.subdomain}.${ROOT_DOMAIN}`}
@@ -48,6 +52,11 @@ export default function SubdomainCard({ subdomain, onEdit, onDelete, onViewAnaly
             {subdomain.subdomain}.{ROOT_DOMAIN}
             <ExternalLink size={12} />
           </a>
+          {subdomain.type === 'redirect' && subdomain.redirectUrl && (
+            <div className={redirectStyles.targetRow}>
+              → {subdomain.redirectUrl}
+            </div>
+          )}
           {subdomain.description && (
             <p className={styles.cardDesc}>{subdomain.description}</p>
           )}
