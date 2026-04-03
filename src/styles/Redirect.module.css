@@ -1,0 +1,60 @@
+.badgeRedirect {
+  font-size: 11px;
+  text-transform: capitalize;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-weight: 600;
+  background: #eef2ff;
+  color: #4338ca;
+}
+
+.targetRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  font-size: 13px;
+  color: #666;
+  font-family: 'SF Mono', Monaco, 'Roboto Mono', Consolas, monospace;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Segmented page/redirect control (shared visual with the form toggle) */
+.segmented {
+  display: inline-flex;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.seg,
+.segActive {
+  padding: 5px 14px;
+  font-size: 12px;
+  background: #fff;
+  border: none;
+  cursor: pointer;
+  color: #666;
+}
+
+.segActive {
+  background: #000;
+  color: #fff;
+}
+
+[data-theme='dark'] .badgeRedirect {
+  background: #1e1b4b;
+  color: #a5b4fc;
+}
+
+[data-theme='dark'] .targetRow {
+  color: #999;
+}
+
+[data-theme='dark'] .seg {
+  background: #111;
+  color: #aaa;
+}
