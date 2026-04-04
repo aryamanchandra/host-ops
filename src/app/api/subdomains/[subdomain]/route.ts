@@ -26,7 +26,10 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({ subdomain });
+    // Legacy docs predate the type field — treat them as page-type.
+    return NextResponse.json({
+      subdomain: { ...subdomain, type: subdomain.type || 'page' },
+    });
   } catch (error) {
     console.error('Error fetching subdomain:', error);
     return NextResponse.json(
