@@ -1,4 +1,5 @@
 import type { Block, ContentFormat } from '@/types/blocks';
+import type { FormSchema } from '@/types/form';
 
 export interface Subdomain {
   _id?: string;
@@ -31,6 +32,7 @@ export interface Subdomain {
   publishAt?: Date | null; // go live at this time
   unpublishAt?: Date | null; // take down at this time
   lastScheduledFlipAt?: Date; // when the scheduler last flipped isActive
+  form?: FormSchema; // optional embedded contact form
   metadata?: {
     author?: string;
     tags?: string[];
@@ -39,6 +41,18 @@ export interface Subdomain {
     noindex?: boolean; // ask crawlers not to index
     [key: string]: any;
   };
+}
+
+export interface FormSubmission {
+  _id?: string;
+  subdomain: string;
+  ownerId: string; // subdomain.userId
+  data: Record<string, string | string[]>;
+  ip?: string;
+  userAgent?: string;
+  referer?: string;
+  isRead: boolean;
+  createdAt: Date;
 }
 
 export interface User {
