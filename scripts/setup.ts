@@ -57,6 +57,11 @@ async function ensureIndexes() {
   await db.collection('subdomains').createIndex({ orgId: 1, createdAt: -1 });
   await db.collection('short_links').createIndex({ orgId: 1, createdAt: -1 });
 
+  // form submissions inbox + spam-window queries
+  await db.collection('form_submissions').createIndex({ subdomain: 1, ownerId: 1, createdAt: -1 });
+  await db.collection('form_submissions').createIndex({ ownerId: 1, isRead: 1 });
+  await db.collection('form_submissions').createIndex({ subdomain: 1, ip: 1, createdAt: -1 });
+
   console.log('Indexes ensured.');
   await client.close();
 }
