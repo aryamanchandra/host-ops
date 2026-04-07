@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from '@/lib/mongodb';
 import { Subdomain } from '@/lib/models';
 import { validateSubmission, createSubmission } from '@/lib/forms';
-import { getClientIp } from '@/lib/rate-limit';
+import { getClientIp, rateLimit } from '@/lib/rate-limit';
+
+const MIN_FILL_MS = 2000;
 
 // Public: accept a contact-form submission for a subdomain.
 export async function POST(
@@ -20,6 +22,21 @@ export async function POST(
 
   const body = await request.json();
   const data = (body?.data || {}) as Record<string, string | string[]>;
+  const ip = getClientIp(request);
+
+  // Spam guard 1: honeypot field — bots fill it; pretend success and drop.
+  if (body?._hp) {
+    return NextResponse.json({ success: true });
+  }
+  // Spam guard 2: minimum fill time between render and submit.
+  const renderedAt = Number(body?._t || 0);
+  if (renderedAt && Date.now() - renderedAt < MIN_FILL_MS) {
+    return NextResponse.json({ error: 'Submitted too quickly' }, { status: 400 });
+  }
+  // Spam guard 3: per-IP rate limit.
+  if (!rateLimit(`submit:${ip}`, 5, 60_000).allowed) {
+    return NextResponse.json({ error: 'Too many submissions' }, { status: 429 });
+  }
 
   const error = validateSubmission(sub.form, data);
   if (error) {
@@ -30,7 +47,7 @@ export async function POST(
     subdomain: params.subdomain,
     ownerId: sub.userId,
     data,
-    ip: getClientIp(request),
+    ip,
     userAgent: request.headers.get('user-agent') || undefined,
     referer: request.headers.get('referer') || undefined,
     isRead: false,
