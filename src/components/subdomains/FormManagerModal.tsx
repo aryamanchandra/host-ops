@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
 import FormBuilder from './FormBuilder';
+import SubmissionsInbox from './SubmissionsInbox';
 import styles from '@/styles/Forms.module.css';
 
 export default function FormManagerModal({
@@ -40,6 +41,7 @@ export default function FormManagerModal({
         </div>
         <div className={styles.body}>
           {tab === 'builder' && <FormBuilder token={token} subdomain={subdomain} />}
+          {tab === 'inbox' && <SubmissionsInbox token={token} subdomain={subdomain} />}
         </div>
       </div>
     </div>
