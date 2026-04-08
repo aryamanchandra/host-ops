@@ -1,4 +1,4 @@
-import { Edit2, Trash2, ExternalLink, BarChart3, History } from 'lucide-react';
+import { Edit2, Trash2, ExternalLink, BarChart3, History, Inbox } from 'lucide-react';
 import styles from '@/styles/page.module.css';
 import versionStyles from '@/styles/VersionHistory.module.css';
 import scheduleStyles from '@/styles/ScheduleChip.module.css';
@@ -14,9 +14,10 @@ interface Props {
   onDelete: (subdomain: string, title: string) => void;
   onViewAnalytics: (subdomain: string) => void;
   onHistory?: (subdomain: string) => void;
+  onForms?: (subdomain: string) => void;
 }
 
-export default function SubdomainCard({ subdomain, onEdit, onDelete, onViewAnalytics, onHistory }: Props) {
+export default function SubdomainCard({ subdomain, onEdit, onDelete, onViewAnalytics, onHistory, onForms }: Props) {
   const status = subdomain.status || 'published';
   const sched = effectiveStatus(subdomain);
   const schedClass: Record<string, string> = {
@@ -80,6 +81,18 @@ export default function SubdomainCard({ subdomain, onEdit, onDelete, onViewAnaly
               title="Version history"
             >
               <History size={14} />
+            </button>
+          )}
+          {onForms && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onForms(subdomain.subdomain);
+              }}
+              className={styles.actionBtn}
+              title="Form & submissions"
+            >
+              <Inbox size={14} />
             </button>
           )}
           <button
