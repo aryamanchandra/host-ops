@@ -1,0 +1,361 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 640px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.tab,
+.tabActive {
+  padding: 6px 14px;
+  font-size: 13px;
+  border: none;
+  background: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #666;
+}
+
+.tabActive {
+  background: #f0f0f0;
+  color: #000;
+  font-weight: 600;
+}
+
+.icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+}
+
+.body {
+  padding: 16px;
+  overflow-y: auto;
+}
+
+/* Builder */
+.builder {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.enableRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.metaInput,
+.fieldLabel,
+.fieldOptions {
+  padding: 8px 10px;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.fieldList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fieldRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.fieldLabel {
+  flex: 1;
+  min-width: 120px;
+}
+
+.fieldOptions {
+  flex: 1;
+  min-width: 140px;
+}
+
+.fieldRow select {
+  padding: 7px 8px;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.reqToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 12px;
+  color: #888;
+}
+
+.fieldRow button {
+  background: none;
+  border: 1px solid #eaeaea;
+  border-radius: 6px;
+  padding: 4px;
+  cursor: pointer;
+  color: #888;
+}
+
+.addField {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: #0070f3;
+  background: none;
+  border: 1px dashed #cdd;
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.builderActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.msg {
+  font-size: 13px;
+  color: #06ce6b;
+}
+
+.save,
+.export {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Inbox */
+.inbox {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.inboxBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.unreadToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #666;
+}
+
+.export {
+  background: #fff;
+  color: #000;
+  border: 1px solid #eaeaea;
+}
+
+.muted {
+  color: #999;
+  font-size: 13px;
+}
+
+.subList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.subRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+}
+
+.subUnread {
+  border-left: 3px solid #0070f3;
+  font-weight: 600;
+}
+
+.subPreview {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+.subDate {
+  color: #999;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.detailOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.detail {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detailRow {
+  display: flex;
+  gap: 10px;
+  font-size: 13px;
+  border-bottom: 1px solid #f5f5f5;
+  padding-bottom: 6px;
+}
+
+.detailKey {
+  color: #999;
+  min-width: 100px;
+}
+
+/* Public form */
+.publicForm {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border: 1px solid #eaeaea;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.publicTitle {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.publicDesc {
+  margin: 0;
+  color: #666;
+}
+
+.publicField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.publicField input,
+.publicField textarea,
+.publicField select {
+  padding: 10px 12px;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.publicSubmit {
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.publicSuccess {
+  color: #0a7f3f;
+  font-weight: 500;
+}
+
+.publicError {
+  color: #e11d48;
+  font-size: 13px;
+}
+
+[data-theme='dark'] .modal,
+[data-theme='dark'] .detail,
+[data-theme='dark'] .subRow {
+  background: #111;
+  border-color: #333;
+  color: #fff;
+}
+
+[data-theme='dark'] .metaInput,
+[data-theme='dark'] .fieldLabel,
+[data-theme='dark'] .fieldOptions,
+[data-theme='dark'] .fieldRow select {
+  background: #1a1a1a;
+  border-color: #333;
+  color: #fff;
+}
+
+[data-theme='dark'] .tabActive {
+  background: #1f1f1f;
+  color: #fff;
+}
