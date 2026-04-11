@@ -86,10 +86,16 @@ function csvCell(v: any): string {
   return `"${s.replace(/"/g, '""')}"`;
 }
 
-/** Render submissions to CSV (columns taken from the first row's data). */
+/** Render submissions to CSV. Columns are the union of all rows' keys so
+ *  heterogeneous submissions (forms edited over time) export completely. */
 export function toCsv(rows: Array<{ data: Record<string, any>; createdAt: string }>): string {
   if (!rows.length) return '';
-  const cols = Object.keys(rows[0].data);
+  const cols = Array.from(
+    rows.reduce((set, r) => {
+      Object.keys(r.data || {}).forEach((k) => set.add(k));
+      return set;
+    }, new Set<string>())
+  );
   const lines = [['createdAt', ...cols].join(',')];
   for (const r of rows) {
     lines.push([r.createdAt, ...cols.map((c) => csvCell(r.data[c]))].join(','));
