@@ -33,8 +33,8 @@ export async function POST(
   if (renderedAt && Date.now() - renderedAt < MIN_FILL_MS) {
     return NextResponse.json({ error: 'Submitted too quickly' }, { status: 400 });
   }
-  // Spam guard 3: per-IP rate limit.
-  if (!rateLimit(`submit:${ip}`, 5, 60_000).allowed) {
+  // Spam guard 3: rate limit scoped to this subdomain + IP.
+  if (!rateLimit(`submit:${params.subdomain}:${ip}`, 5, 60_000).allowed) {
     return NextResponse.json({ error: 'Too many submissions' }, { status: 429 });
   }
 
