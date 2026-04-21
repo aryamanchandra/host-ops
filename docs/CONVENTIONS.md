@@ -42,6 +42,13 @@ if (auth instanceof NextResponse) return auth;
 - Saving an edit snapshots the prior state into `subdomain_versions` and marks the subdomain a **draft** (unchanged saves are skipped). Publishing copies the current draft into `publishedContent`.
 - History/restore: `GET /api/subdomains/[s]/versions`, `POST …/versions/[v]/restore`, `POST …/publish`. UI: `VersionHistoryModal` (jsdiff viewer + sandboxed preview). Only the newest 50 versions are kept (`pruneVersions`).
 
+## Forms & submissions
+
+- A subdomain can embed a contact form (`subdomain.form`: `FormSchema` with typed `fields`). Managed via `FormManagerModal` (builder + inbox tabs).
+- Public submissions POST to `/api/subdomains/[s]/submit` and are stored in `form_submissions` (scoped to the owner). Inbox: `/api/submissions?subdomain=`, CSV export at `/api/submissions/export`, mark-read via `PATCH /api/submissions/[id]`.
+- **Spam protection:** honeypot field (`_hp`), minimum fill time (`_t`, 2s), and a per-(subdomain, IP) rate limit (5/min).
+- CSV export unions columns across all submissions so forms edited over time export completely.
+
 ## Public endpoints
 
 - Public write endpoints (`/api/analytics/track`, `/api/links/redirect/[slug]`, future form submissions) must pass through `rateLimit` from [../src/lib/rate-limit.ts](../src/lib/rate-limit.ts).
