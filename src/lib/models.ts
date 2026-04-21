@@ -114,10 +114,32 @@ export interface ShortLink {
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
-  expiresAt?: Date;
+  expiresAt?: Date | null;
+  passwordHash?: string; // bcrypt; never returned to clients
   metadata?: {
     title?: string;
     description?: string;
+    utm?: {
+      source?: string;
+      medium?: string;
+      campaign?: string;
+      term?: string;
+      content?: string;
+    };
     [key: string]: any;
   };
+}
+
+export interface BioProfile {
+  _id?: string;
+  userId: string;
+  username: string; // lowercased; used in the public URL
+  displayName: string;
+  avatar?: string;
+  bio?: string;
+  accentColor?: string;
+  links: Array<{ label: string; url: string; order: number }>;
+  isPublic: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
