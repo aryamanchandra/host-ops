@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from '@/lib/mongodb';
 import { ShortLink } from '@/lib/models';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { isExpired } from '@/lib/linkExtras';
 
 // Public endpoint for redirecting short links
 export async function GET(
@@ -24,6 +25,11 @@ export async function GET(
 
     if (!link) {
       return NextResponse.json({ error: 'Link not found' }, { status: 404 });
+    }
+
+    // Expired links are no longer served.
+    if (isExpired(link.expiresAt)) {
+      return NextResponse.json({ error: 'Link expired', expired: true }, { status: 410 });
     }
 
     // Increment click counter
