@@ -1,3 +1,11 @@
+export interface Utm {
+  source?: string;
+  medium?: string;
+  campaign?: string;
+  term?: string;
+  content?: string;
+}
+
 export interface ShortLink {
   _id: string;
   slug: string;
@@ -6,9 +14,11 @@ export interface ShortLink {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  expiresAt?: string | null;
   metadata?: {
     title?: string;
     description?: string;
+    utm?: Utm;
   };
 }
 
@@ -17,5 +27,8 @@ export interface LinkFormData {
   targetUrl: string;
   title: string;
   description: string;
+  expiresAt?: string;
+  password?: string;
+  utm?: Utm;
 }
 

@@ -3,11 +3,13 @@
 import { useState } from 'react';
 import pageStyles from '@/styles/page.module.css';
 import styles from '@/styles/LinkShortener.module.css';
-import { Plus, Edit2, Trash2, Copy, ExternalLink, BarChart3, Check, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, Copy, ExternalLink, BarChart3, Check, X, QrCode } from 'lucide-react';
 import type { ShortLink, LinkFormData } from '@/types';
 import { useAuth, useLinks } from '@/hooks';
 import { formatDate } from '@/helpers/date';
 import { copyToClipboard } from '@/helpers/clipboard';
+import UtmBuilder from '@/components/links/UtmBuilder';
+import LinkQrModal from '@/components/links/LinkQrModal';
 
 const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN!;
 
@@ -19,7 +21,9 @@ export default function LinkShortenerPage() {
   const [error, setError] = useState('');
   const [copiedSlug, setCopiedSlug] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
-  const [formData, setFormData] = useState<LinkFormData>({ slug: '', targetUrl: '', title: '', description: '' });
+  const [qrUrl, setQrUrl] = useState<string | null>(null);
+  const emptyForm: LinkFormData = { slug: '', targetUrl: '', title: '', description: '', expiresAt: '', password: '', utm: {} };
+  const [formData, setFormData] = useState<LinkFormData>(emptyForm);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +39,7 @@ export default function LinkShortenerPage() {
       const data = await response.json();
       if (!response.ok) { setError(data.error || 'Operation failed'); return; }
       setShowForm(false); setEditingLink(null);
-      setFormData({ slug: '', targetUrl: '', title: '', description: '' });
+      setFormData(emptyForm);
       refetch();
     } catch {
       setError('Operation failed');
@@ -44,7 +48,15 @@ export default function LinkShortenerPage() {
 
   const handleEdit = (link: ShortLink) => {
     setEditingLink(link);
-    setFormData({ slug: link.slug, targetUrl: link.targetUrl, title: link.metadata?.title || '', description: link.metadata?.description || '' });
+    setFormData({
+      slug: link.slug,
+      targetUrl: link.targetUrl,
+      title: link.metadata?.title || '',
+      description: link.metadata?.description || '',
+      expiresAt: link.expiresAt ? new Date(link.expiresAt).toISOString().slice(0, 16) : '',
+      password: '',
+      utm: link.metadata?.utm || {},
+    });
     setShowForm(true);
   };
 
@@ -106,6 +118,18 @@ export default function LinkShortenerPage() {
                   <label>Description (Optional)</label>
                   <input type="text" placeholder="Link description" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
                 </div>
+                <div className={styles.formGroup}>
+                  <label>Expires at (Optional)</label>
+                  <input type="datetime-local" value={formData.expiresAt} onChange={(e) => setFormData({ ...formData, expiresAt: e.target.value })} />
+                </div>
+                <div className={styles.formGroup}>
+                  <label>Password (Optional)</label>
+                  <input type="password" placeholder="Protect this link" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} />
+                </div>
+                <div className={styles.formGroup}>
+                  <label>UTM parameters (Optional)</label>
+                  <UtmBuilder value={formData.utm || {}} onChange={(utm) => setFormData({ ...formData, utm })} />
+                </div>
                 <div className={styles.formActions}>
                   <button type="button" onClick={() => setShowForm(false)} className={styles.cancelButton}>Cancel</button>
                   <button type="submit" className={styles.submitButton}>{editingLink ? 'Update' : 'Create'}</button>
@@ -146,6 +170,7 @@ export default function LinkShortenerPage() {
                   <div className={styles.cardActions}>
                     <button onClick={() => handleEdit(link)} className={styles.actionButton}><Edit2 size={16} /><span>Edit</span></button>
                     <button onClick={() => window.open(`https://url.${ROOT_DOMAIN}/${link.slug}`, '_blank')} className={styles.actionButton}><ExternalLink size={16} /><span>Visit</span></button>
+                    <button onClick={() => setQrUrl(`https://url.${ROOT_DOMAIN}/${link.slug}`)} className={styles.actionButton}><QrCode size={16} /><span>QR</span></button>
                     <button onClick={() => setDeleteConfirm(link.slug)} className={styles.deleteButton}><Trash2 size={16} /><span>Delete</span></button>
                   </div>
                 </div>
@@ -153,6 +178,8 @@ export default function LinkShortenerPage() {
             </div>
           )}
         </div>
+
+        {qrUrl && <LinkQrModal url={qrUrl} onClose={() => setQrUrl(null)} />}
 
         {deleteConfirm && (
           <div className={styles.confirmModal} onClick={() => setDeleteConfirm(null)}>
