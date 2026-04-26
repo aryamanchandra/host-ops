@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyToken } from '@/lib/auth';
+import { verifyToken, hashPassword } from '@/lib/auth';
 import { getDb } from '@/lib/mongodb';
 import { ShortLink } from '@/lib/models';
 
@@ -55,7 +55,8 @@ export async function PUT(
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
-    const { targetUrl, isActive, title, description } = await request.json();
+    const { targetUrl, isActive, title, description, expiresAt, password } =
+      await request.json();
 
     if (!targetUrl) {
       return NextResponse.json({ error: 'Target URL is required' }, { status: 400 });
@@ -70,17 +71,20 @@ export async function PUT(
 
     const db = await getDb();
 
+    const set: Record<string, any> = {
+      targetUrl,
+      isActive: isActive !== undefined ? isActive : true,
+      updatedAt: new Date(),
+      'metadata.title': title,
+      'metadata.description': description,
+      expiresAt: expiresAt ? new Date(expiresAt) : null,
+    };
+    // Only (re)set the password when a new one is provided.
+    if (password) set.passwordHash = await hashPassword(password);
+
     const result = await db.collection<ShortLink>('short_links').findOneAndUpdate(
       { slug: params.slug, userId: decoded.userId },
-      {
-        $set: {
-          targetUrl,
-          isActive: isActive !== undefined ? isActive : true,
-          updatedAt: new Date(),
-          'metadata.title': title,
-          'metadata.description': description,
-        },
-      },
+      { $set: set },
       { returnDocument: 'after' }
     );
 
@@ -88,7 +92,8 @@ export async function PUT(
       return NextResponse.json({ error: 'Link not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ link: result });
+    const { passwordHash, ...safe } = result as any;
+    return NextResponse.json({ link: safe });
   } catch (error) {
     console.error('Error updating short link:', error);
     return NextResponse.json({ error: 'Failed to update link' }, { status: 500 });

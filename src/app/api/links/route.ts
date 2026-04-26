@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth, resolveOrgId } from '@/lib/api-auth';
+import { hashPassword } from '@/lib/auth';
 import { getDb } from '@/lib/mongodb';
 import { ShortLink } from '@/lib/models';
+import { buildUtmUrl } from '@/lib/linkExtras';
 
 // GET all short links for authenticated user
 export async function GET(request: NextRequest) {
@@ -36,7 +38,8 @@ export async function POST(request: NextRequest) {
 
     const orgId = await resolveOrgId(request, auth.userId);
 
-    const { slug, targetUrl, title, description } = await request.json();
+    const { slug, targetUrl, title, description, expiresAt, password, utm } =
+      await request.json();
 
     if (!slug || !targetUrl) {
       return NextResponse.json(
@@ -71,25 +74,32 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Slug already exists' }, { status: 409 });
     }
 
+    const finalUrl = utm ? buildUtmUrl(targetUrl, utm) : targetUrl;
+
     const newLink: ShortLink = {
       slug: slug.toLowerCase(),
-      targetUrl,
+      targetUrl: finalUrl,
       userId: auth.userId,
       orgId: orgId || undefined,
       clicks: 0,
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date(),
+      expiresAt: expiresAt ? new Date(expiresAt) : null,
+      passwordHash: password ? await hashPassword(password) : undefined,
       metadata: {
         title,
         description,
+        utm: utm || undefined,
       },
     };
 
     const result = await db.collection<ShortLink>('short_links').insertOne(newLink);
 
+    // Never leak the password hash back to the client.
+    const { passwordHash, ...safe } = newLink;
     return NextResponse.json({
-      link: { ...newLink, _id: result.insertedId.toString() },
+      link: { ...safe, _id: result.insertedId.toString() },
     });
   } catch (error) {
     console.error('Error creating short link:', error);
