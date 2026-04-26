@@ -32,6 +32,11 @@ export async function GET(
       return NextResponse.json({ error: 'Link expired', expired: true }, { status: 410 });
     }
 
+    // Password-protected links resolve via the /verify endpoint instead.
+    if (link.passwordHash) {
+      return NextResponse.json({ requiresPassword: true });
+    }
+
     // Increment click counter
     await db
       .collection<ShortLink>('short_links')
