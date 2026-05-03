@@ -11,4 +11,5 @@ export * from './useDebouncedValue';
 export * from './useVersions';
 export * from './useFormSchema';
 export * from './useSubmissions';
+export * from './useBioProfile';
 
