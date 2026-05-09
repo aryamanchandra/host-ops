@@ -24,7 +24,10 @@ export async function GET(
     const db = await getDb();
     const link = await db
       .collection<ShortLink>('short_links')
-      .findOne({ slug: params.slug, userId: decoded.userId });
+      .findOne(
+        { slug: params.slug, userId: decoded.userId },
+        { projection: { passwordHash: 0 } }
+      );
 
     if (!link) {
       return NextResponse.json({ error: 'Link not found' }, { status: 404 });

@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     const db = await getDb();
     const links = await db
       .collection<ShortLink>('short_links')
-      .find(filter)
+      .find(filter, { projection: { passwordHash: 0 } })
       .sort({ createdAt: -1 })
       .toArray();
 
@@ -72,6 +72,10 @@ export async function POST(request: NextRequest) {
 
     if (existing) {
       return NextResponse.json({ error: 'Slug already exists' }, { status: 409 });
+    }
+
+    if (expiresAt && new Date(expiresAt).getTime() <= Date.now()) {
+      return NextResponse.json({ error: 'Expiry must be in the future' }, { status: 400 });
     }
 
     const finalUrl = utm ? buildUtmUrl(targetUrl, utm) : targetUrl;
