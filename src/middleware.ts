@@ -24,7 +24,14 @@ export function middleware(request: NextRequest) {
   if (hostWithoutPort.endsWith(`.${rootDomain}`)) {
     // Extract the subdomain part
     const subdomain = hostWithoutPort.replace(`.${rootDomain}`, '');
-    
+
+    // Reserved subdomains map to dedicated routes instead of hosted content.
+    const reserved: Record<string, string> = { bio: '/bio', url: '/url' };
+    if (reserved[subdomain]) {
+      url.pathname = `${reserved[subdomain]}${url.pathname}`;
+      return NextResponse.rewrite(url);
+    }
+
     // Rewrite to /subdomain/[subdomain] route
     url.pathname = `/subdomain/${subdomain}${url.pathname}`;
     return NextResponse.rewrite(url);

@@ -14,6 +14,12 @@ export default function PublicBioPage() {
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((d) => setP(d.profile))
       .catch(() => setNotFound(true));
+    // Track the bio page view under a reserved bio:* analytics key.
+    fetch('/api/analytics/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subdomain: `bio:${username}`, path: '/' }),
+    }).catch(() => {});
   }, [username]);
 
   const wrap: React.CSSProperties = {
