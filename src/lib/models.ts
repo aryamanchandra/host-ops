@@ -43,6 +43,55 @@ export interface Subdomain {
   };
 }
 
+export type MonitorStatus = 'up' | 'down' | 'degraded' | 'unknown';
+
+export interface SslInfo {
+  issuer?: string;
+  validTo?: Date | string;
+  daysLeft?: number;
+  valid?: boolean;
+}
+
+export interface Monitor {
+  _id?: string;
+  userId: string;
+  subdomain?: string; // optional link to a subdomain
+  host: string; // FQDN probed
+  targetUrl: string;
+  intervalMinutes: number;
+  certWarnDays: number;
+  isActive: boolean;
+  lastStatus: MonitorStatus;
+  lastCheckedAt?: Date;
+  lastResponseMs?: number;
+  lastSsl?: SslInfo;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface MonitorCheck {
+  _id?: string;
+  monitorId: string;
+  host: string;
+  statusCode?: number;
+  responseTimeMs?: number;
+  status: MonitorStatus;
+  ssl?: SslInfo | null;
+  error?: string;
+  checkedAt: Date;
+}
+
+export interface MonitorAlert {
+  _id?: string;
+  monitorId: string;
+  userId: string;
+  type: 'down' | 'cert-expiring' | 'recovered';
+  message: string;
+  certDaysLeft?: number;
+  createdAt: Date;
+  notifiedVia: 'email' | 'log' | 'none';
+}
+
 export interface FormSubmission {
   _id?: string;
   subdomain: string;

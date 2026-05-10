@@ -39,6 +39,7 @@
     "recharts": "^3.2.1",
     "rehype-sanitize": "^6.0.0",
     "remark-gfm": "^4.0.1",
+    "resend": "^6.12.4",
     "ua-parser-js": "^2.0.10"
   },
   "devDependencies": {
