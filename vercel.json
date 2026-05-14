@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/publish-scheduler",
       "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/cron/monitor-checks",
+      "schedule": "*/5 * * * *"
     }
   ]
 }
