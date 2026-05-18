@@ -12,4 +12,5 @@ export * from './useVersions';
 export * from './useFormSchema';
 export * from './useSubmissions';
 export * from './useBioProfile';
+export * from './useMonitors';
 
