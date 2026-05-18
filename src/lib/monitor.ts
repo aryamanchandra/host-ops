@@ -123,5 +123,67 @@ export async function runCheck(monitor: Monitor): Promise<CheckResult> {
     }
   );
 
+  await dispatchAlerts(monitor, status, monitor.lastStatus, ssl);
   return { status, prevStatus: monitor.lastStatus, ssl, probe };
+}
+
+async function notify(subject: string, text: string): Promise<'email' | 'log' | 'none'> {
+  const key = process.env.RESEND_API_KEY;
+  const to = process.env.ALERT_EMAIL;
+  if (!key || !to) {
+    console.log('[monitor alert]', subject, '-', text);
+    return 'log';
+  }
+  try {
+    const { Resend } = await import('resend');
+    const resend = new Resend(key);
+    await resend.emails.send({
+      from: process.env.ALERT_FROM || 'alerts@domainbase.app',
+      to,
+      subject,
+      text,
+    });
+    return 'email';
+  } catch {
+    return 'none';
+  }
+}
+
+/** Raise alerts on down/recovered transitions and expiring certificates. */
+export async function dispatchAlerts(
+  monitor: Monitor,
+  status: MonitorStatus,
+  prevStatus: MonitorStatus,
+  ssl: SslInfo | null
+): Promise<void> {
+  const pending: Array<{ type: 'down' | 'recovered' | 'cert-expiring'; message: string; certDaysLeft?: number }> = [];
+
+  if (status === 'down' && prevStatus !== 'down') {
+    pending.push({ type: 'down', message: `${monitor.host} is down` });
+  }
+  if (status === 'up' && (prevStatus === 'down' || prevStatus === 'degraded')) {
+    pending.push({ type: 'recovered', message: `${monitor.host} has recovered` });
+  }
+  if (ssl && typeof ssl.daysLeft === 'number' && ssl.daysLeft <= (monitor.certWarnDays || 14)) {
+    pending.push({
+      type: 'cert-expiring',
+      message: `${monitor.host} TLS certificate expires in ${ssl.daysLeft} day(s)`,
+      certDaysLeft: ssl.daysLeft,
+    });
+  }
+  if (!pending.length) return;
+
+  const db = await getDb();
+  for (const a of pending) {
+    const notifiedVia = await notify(`[Domainbase] ${a.message}`, a.message);
+    await db.collection('monitor_alerts').insertOne({
+      monitorId: String(monitor._id),
+      userId: monitor.userId,
+      type: a.type,
+      message: a.message,
+      certDaysLeft: a.certDaysLeft,
+      createdAt: new Date(),
+      notifiedVia,
+    } as any);
+  }
 }
