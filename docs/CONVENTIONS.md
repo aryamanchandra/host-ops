@@ -49,6 +49,13 @@ if (auth instanceof NextResponse) return auth;
 - **Spam protection:** honeypot field (`_hp`), minimum fill time (`_t`, 2s), and a per-(subdomain, IP) rate limit (5/min).
 - CSV export unions columns across all submissions so forms edited over time export completely.
 
+## Health & SSL monitoring
+
+- `monitors` track a host's uptime + TLS cert; checks are stored in `monitor_checks` (90-day TTL) and alerts in `monitor_alerts`.
+- The engine ([src/lib/monitor.ts](../src/lib/monitor.ts)) probes HTTPS for status/latency and inspects the TLS cert (issuer, days-to-expiry) — self-signed and IDN hosts handled.
+- Cron `GET /api/cron/monitor-checks` (every 5 min via [vercel.json](../vercel.json)) runs due checks with bounded concurrency, guarded by `CRON_SECRET`.
+- Alerts fire on down/recovered transitions and expiring certs. Email goes out via `RESEND_API_KEY` + `ALERT_EMAIL`; otherwise it logs.
+
 ## Public endpoints
 
 - Public write endpoints (`/api/analytics/track`, `/api/links/redirect/[slug]`, future form submissions) must pass through `rateLimit` from [../src/lib/rate-limit.ts](../src/lib/rate-limit.ts).
