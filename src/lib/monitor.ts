@@ -35,14 +35,36 @@ export function probeHttp(targetUrl: string, timeoutMs = TIMEOUT_MS): Promise<Ht
 /** Inspect the TLS certificate for a host (issuer + days until expiry). */
 export function inspectTls(host: string, timeoutMs = TIMEOUT_MS): Promise<SslInfo | null> {
   return new Promise((resolve) => {
+    let settled = false;
+    const done = (v: SslInfo | null) => {
+      if (!settled) {
+        settled = true;
+        resolve(v);
+      }
+    };
     try {
+      // Punycode-encode IDN hosts; inspect self-signed certs too (we still
+      // want issuer/expiry even when the chain doesn't validate).
+      const asciiHost = (() => {
+        try {
+          return new URL(`https://${host}`).hostname;
+        } catch {
+          return host;
+        }
+      })();
       const socket = tls.connect(
-        { host, port: 443, servername: host, timeout: timeoutMs },
+        {
+          host: asciiHost,
+          port: 443,
+          servername: asciiHost,
+          timeout: timeoutMs,
+          rejectUnauthorized: false,
+        },
         () => {
           const cert = socket.getPeerCertificate();
           if (!cert || !cert.valid_to) {
             socket.end();
-            resolve(null);
+            done(null);
             return;
           }
           const validTo = new Date(cert.valid_to);
@@ -51,16 +73,16 @@ export function inspectTls(host: string, timeoutMs = TIMEOUT_MS): Promise<SslInf
             (cert.issuer && ((cert.issuer as any).O || (cert.issuer as any).CN)) || undefined;
           const authorized = socket.authorized;
           socket.end();
-          resolve({ issuer, validTo: validTo.toISOString(), daysLeft, valid: authorized });
+          done({ issuer, validTo: validTo.toISOString(), daysLeft, valid: authorized });
         }
       );
       socket.on('timeout', () => {
         socket.destroy();
-        resolve(null);
+        done(null);
       });
-      socket.on('error', () => resolve(null));
+      socket.on('error', () => done(null));
     } catch {
-      resolve(null);
+      done(null);
     }
   });
 }
