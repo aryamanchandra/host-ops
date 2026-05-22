@@ -28,14 +28,13 @@ export async function GET(request: NextRequest) {
       now - new Date(m.lastCheckedAt).getTime() >= (m.intervalMinutes || 15) * 60_000
   );
 
+  // Bound concurrency so a large fleet doesn't open hundreds of sockets at once.
+  const CONCURRENCY = 5;
   let checked = 0;
-  for (const m of due) {
-    try {
-      await runCheck(m as Monitor);
-      checked++;
-    } catch {
-      // skip failed check; next run retries
-    }
+  for (let i = 0; i < due.length; i += CONCURRENCY) {
+    const batch = due.slice(i, i + CONCURRENCY);
+    const results = await Promise.allSettled(batch.map((m) => runCheck(m as Monitor)));
+    checked += results.filter((r) => r.status === 'fulfilled').length;
   }
 
   return NextResponse.json({ checked, due: due.length });

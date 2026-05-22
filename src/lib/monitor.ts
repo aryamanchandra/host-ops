@@ -95,6 +95,10 @@ export async function ensureMonitorIndexes(): Promise<void> {
   await db.collection('monitors').createIndex({ userId: 1, host: 1 }, { unique: true });
   await db.collection('monitors').createIndex({ isActive: 1, lastCheckedAt: 1 });
   await db.collection('monitor_checks').createIndex({ monitorId: 1, checkedAt: -1 });
+  // Cap history growth: drop checks older than 90 days.
+  await db
+    .collection('monitor_checks')
+    .createIndex({ checkedAt: 1 }, { expireAfterSeconds: 90 * 24 * 60 * 60 });
   indexesEnsured = true;
 }
 
