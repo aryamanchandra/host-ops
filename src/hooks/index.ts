@@ -13,4 +13,5 @@ export * from './useFormSchema';
 export * from './useSubmissions';
 export * from './useBioProfile';
 export * from './useMonitors';
+export * from './useLiveVisitors';
 
