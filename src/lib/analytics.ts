@@ -3,6 +3,7 @@ import { parseUserAgent } from './userAgent';
 import { lookupGeo } from './geo';
 import { parseUtmParams } from './utm';
 import type { LiveAnalytics } from '@/types/live';
+import type { LiveVisitors } from '@/types/livemap';
 
 export const LIVE_WINDOW_SECONDS = 300; // visitors active within 5 minutes
 
@@ -327,5 +328,51 @@ export async function getLiveAnalytics(
     windowSeconds,
     recentEvents,
   };
+}
+
+/**
+ * Recent geolocated visitors for the live map. Scope by a single subdomain,
+ * a set of subdomains, or all (caller is responsible for access control).
+ */
+export async function getRecentVisitors(opts: {
+  subdomain?: string;
+  subdomains?: string[];
+  windowSeconds?: number;
+} = {}): Promise<LiveVisitors> {
+  const windowSeconds = opts.windowSeconds || LIVE_WINDOW_SECONDS;
+  const db = await getDb();
+  const since = new Date(Date.now() - windowSeconds * 1000);
+
+  const q: any = { timestamp: { $gte: since }, countryCode: { $exists: true } };
+  if (opts.subdomain) q.subdomain = opts.subdomain;
+  else if (opts.subdomains) q.subdomain = { $in: opts.subdomains };
+
+  const views = await db
+    .collection<PageView>('pageviews')
+    .find(q)
+    .sort({ timestamp: -1 })
+    .limit(300)
+    .toArray();
+
+  const pings = views.map((v, i) => ({
+    id: `${v.timestamp instanceof Date ? v.timestamp.getTime() : v.timestamp}-${i}`,
+    countryCode: v.countryCode!,
+    country: v.country,
+    city: v.city,
+    timestamp: v.timestamp instanceof Date ? v.timestamp.toISOString() : String(v.timestamp),
+  }));
+
+  const map = new Map<string, { country: string; count: number }>();
+  views.forEach((v) => {
+    if (!v.countryCode) return;
+    const e = map.get(v.countryCode) || { country: v.country || v.countryCode, count: 0 };
+    e.count += 1;
+    map.set(v.countryCode, e);
+  });
+  const countries = Array.from(map.entries())
+    .map(([countryCode, { country, count }]) => ({ countryCode, country, count }))
+    .sort((a, b) => b.count - a.count);
+
+  return { pings, countries, windowSeconds };
 }
 
