@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import NextLink from 'next/link';
 import { 
   Globe, LogOut, Moon, Sun, Search, Shield, BarChart3,
-  Home, Menu, X as CloseIcon, ChevronDown, ChevronLeft, ChevronRight, Link, Users, LayoutTemplate, Contact, Activity
+  Home, Menu, X as CloseIcon, ChevronDown, ChevronLeft, ChevronRight, Link, Users, LayoutTemplate, Contact, Activity, MapPin
 } from 'lucide-react';
 import styles from '@/styles/Sidebar.module.css';
 import Image from 'next/image';
@@ -46,6 +46,7 @@ export default function Sidebar({
     { path: '/dns-records', label: 'Domain Manager', icon: Shield },
     { path: '/whois', label: 'WHOIS Lookup', icon: Globe },
     { path: '/health', label: 'Health', icon: Activity },
+    { path: '/live-map', label: 'Live Map', icon: MapPin },
     { path: '/team', label: 'Team', icon: Users },
   ];
 
