@@ -1,0 +1,155 @@
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.sub {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  margin: 6px 0 0;
+  font-size: 14px;
+}
+
+.liveDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #06ce6b;
+  display: inline-block;
+  box-shadow: 0 0 0 0 rgba(6, 206, 107, 0.6);
+  animation: livePulse 1.6s infinite;
+}
+
+@keyframes livePulse {
+  0% { box-shadow: 0 0 0 0 rgba(6, 206, 107, 0.55); }
+  70% { box-shadow: 0 0 0 8px rgba(6, 206, 107, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(6, 206, 107, 0); }
+}
+
+.filter {
+  padding: 8px 12px;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #fff;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+}
+
+.mapWrap {
+  background: #fff;
+  border: 1px solid #eaeaea;
+  border-radius: 12px;
+  padding: 12px;
+  overflow: hidden;
+}
+
+.mapWrap svg {
+  width: 100%;
+  height: auto;
+}
+
+.marker {
+  fill: #0070f3;
+  fill-opacity: 0.7;
+}
+
+.markerNew {
+  fill: #06ce6b;
+  transform-origin: center;
+  animation: ripple 1.2s ease-out;
+}
+
+@keyframes ripple {
+  0% { r: 2; fill-opacity: 0.9; }
+  100% { r: 9; fill-opacity: 0.2; }
+}
+
+.countryPanel {
+  background: #fff;
+  border: 1px solid #eaeaea;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.countryPanel h3 {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.empty {
+  color: #999;
+  font-size: 13px;
+}
+
+.countryList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.countryList li {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  padding: 6px 0;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.count {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: #0070f3;
+}
+
+@media (max-width: 820px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+[data-theme='dark'] .mapWrap,
+[data-theme='dark'] .countryPanel,
+[data-theme='dark'] .filter {
+  background: #111;
+  border-color: #333;
+  color: #fff;
+}
+
+[data-theme='dark'] .title {
+  color: #fff;
+}
+
+[data-theme='dark'] .mapWrap :global(path) {
+  fill: #1f1f1f !important;
+  stroke: #333 !important;
+}
+
+[data-theme='dark'] .countryList li {
+  border-bottom-color: #222;
+}
