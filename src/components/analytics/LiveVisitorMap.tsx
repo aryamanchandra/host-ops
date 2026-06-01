@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps';
 import type { LiveVisitorPing } from '@/types/livemap';
 import { countryCentroid, jitter } from '@/helpers/centroids';
@@ -14,22 +15,23 @@ export default function LiveVisitorMap({
   pings: LiveVisitorPing[];
   newIds: Set<string>;
 }) {
-  // Cap markers per country so a busy country doesn't stack into a blob.
-  const PER_COUNTRY = 12;
-  const perCountry: Record<string, number> = {};
-  const markers = pings
-    .map((p, i) => {
+  // Cap markers per country (avoid blobs) and overall (keep rendering cheap),
+  // memoized so we only recompute when the ping set changes.
+  const markers = useMemo(() => {
+    const PER_COUNTRY = 12;
+    const MAX_MARKERS = 200;
+    const perCountry: Record<string, number> = {};
+    const out: Array<{ id: string; coords: [number, number]; isNew: boolean }> = [];
+    for (let i = 0; i < pings.length && out.length < MAX_MARKERS; i++) {
+      const p = pings[i];
       const c = countryCentroid(p.countryCode);
-      if (!c) return null;
+      if (!c) continue;
       perCountry[p.countryCode] = (perCountry[p.countryCode] || 0) + 1;
-      if (perCountry[p.countryCode] > PER_COUNTRY) return null;
-      return {
-        id: p.id,
-        coords: jitter(c, i + p.id.length),
-        isNew: newIds.has(p.id),
-      };
-    })
-    .filter(Boolean) as Array<{ id: string; coords: [number, number]; isNew: boolean }>;
+      if (perCountry[p.countryCode] > PER_COUNTRY) continue;
+      out.push({ id: p.id, coords: jitter(c, i + p.id.length), isNew: newIds.has(p.id) });
+    }
+    return out;
+  }, [pings, newIds]);
 
   return (
     <div className={styles.mapWrap}>
