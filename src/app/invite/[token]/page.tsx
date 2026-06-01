@@ -139,7 +139,7 @@ export default function InvitePage() {
 
         {status === 'done' && (
           <>
-            <h1 style={{ fontSize: 22, margin: '0 0 8px' }}>You're in 🎉</h1>
+            <h1 style={{ fontSize: 22, margin: '0 0 8px' }}>You&apos;re in 🎉</h1>
             <p style={{ color: '#666' }}>Redirecting to your dashboard…</p>
           </>
         )}
