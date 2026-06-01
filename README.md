@@ -1,186 +1,92 @@
 # Domainbase
 
-A modern domain management platform with subdomain management, DNS configuration, link shortening, and real-time analytics.
+A domain management platform: subdomain hosting, a link shortener, real-time
+analytics, DNS/WHOIS tooling, uptime + SSL monitoring, and team workspaces.
+Built with Next.js 14 (App Router), MongoDB, and the NameSilo API.
 
 ## Features
 
-- Dynamic Subdomain Management - Create and manage unlimited subdomains
-- Link Shortener - Built-in URL shortener with click tracking
-- Real-time Analytics - Track visits, devices, browsers, and geographic data
-- Google OAuth - Secure authentication
-- DNS Management - Manage DNS records, nameservers, and domain info via NameSilo API
-- Clean UI - Vercel-inspired minimal design with dark mode
-- Fast & Reliable - Built with Next.js 14 and MongoDB
+### Subdomain hosting
+- **SSR pages** with per-subdomain `<title>`/OpenGraph/Twitter metadata and proper 404s
+- **Three authoring modes** — raw HTML, **Markdown** (GFM, sanitized), and a **block page builder** (hero / text / image / button / divider / embed) with live preview
+- **Template gallery** — start from landing / link-in-bio / coming-soon / docs / portfolio templates
+- **Content versioning** — every edit is snapshotted; draft vs published, diff viewer, one-click rollback
+- **Scheduled publish/unpublish** — go live / take down on a schedule (per-minute cron)
+- **Redirect-only subdomains** — 301/302 to any destination
+- **Form builder + submissions inbox** — configurable contact forms with spam guards (honeypot, min-fill-time, rate limit) and CSV export
 
-## Quick Start
+### Link shortener
+- Click tracking, **QR codes**, **UTM builder**, **link expiration**, **password-protected links**, and a **link-in-bio** page
 
-### Prerequisites
+### Analytics
+- Privacy-light pageview tracking with accurate device/browser/OS (`ua-parser-js`)
+- **Geo analytics** (IP → country/city) with a choropleth map + top countries
+- **UTM campaign** breakdown (sources / mediums / campaigns)
+- **Real-time dashboard** (SSE live visitors + recent events)
+- **Live visitor map** — animated world map of recent hits
 
-- Node.js 18+
-- MongoDB database
-- NameSilo account with API access
-- Google OAuth credentials
+### Domain tooling
+- DNS records manager, DNS checker, propagation map, WHOIS / domain info (NameSilo API)
+- **SSL + health monitoring** — uptime + TLS cert expiry checks, history, alerts (email via Resend)
 
-### Installation
+### Platform
+- **Teams / multi-tenant** — organizations, roles (owner/admin/member), email invites, org switcher
+- Google OAuth + JWT auth, dark mode, Vercel-inspired clean UI
 
-1. Clone and install:
+## Tech stack
+
+Next.js 14 · React 18 · TypeScript · MongoDB · CSS Modules · NameSilo API ·
+recharts · react-simple-maps · react-markdown · isomorphic-dompurify · Resend
+
+## Quick start
+
 ```bash
-git clone <your-repo>
-cd subdomain-creator
 npm install
-```
-
-2. Create `.env.local`:
-```env
-# Domain Configuration
-NEXT_PUBLIC_ROOT_DOMAIN=app.yourdomain.com
-NAMESILO_DOMAIN=yourdomain.com
-ROOT_DOMAIN=app.yourdomain.com
-
-# NameSilo API
-NAMESILO_API_KEY=your_namesilo_api_key
-
-# Database
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/dbname
-
-# Authentication
-JWT_SECRET=your_random_secret_key_here
-GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_CLIENT_SECRET=your_google_client_secret
-```
-
-3. Run development server:
-```bash
+cp .env.example .env.local   # then fill in values
+npm run setup                # create MongoDB indexes
 npm run dev
 ```
 
-Visit `http://localhost:3000`
+### Environment
 
-## Deployment (Vercel)
+See [.env.example](.env.example). Required: `MONGODB_URI`, `JWT_SECRET`,
+`ROOT_DOMAIN`, `NEXT_PUBLIC_ROOT_DOMAIN`. Optional: NameSilo, Google OAuth,
+`CRON_SECRET` (scheduled publish + monitor crons), `RESEND_API_KEY` + `ALERT_EMAIL`
+(monitor alerts).
 
-### 1. Vercel Setup
+## Scripts
 
-1. Import your project to Vercel
+| Command | Purpose |
+|---------|---------|
+| `npm run dev` / `build` / `start` | Next.js dev / production build / serve |
+| `npm run setup` | Create MongoDB indexes ([scripts/setup.ts](scripts/setup.ts)) |
+| `npm run migrate:orgs` | Backfill personal orgs + `orgId` onto existing data |
+| `npm run test:smoke` / `test:ua` / `test:utm` | Lightweight unit/smoke tests |
 
-2. Add domains in Project Settings → Domains:
-   - `app.yourdomain.com`
-   - `*.app.yourdomain.com`
+## Scheduled jobs (Vercel cron)
 
-3. Add environment variables (copy all from `.env.local`)
+Configured in [vercel.json](vercel.json):
+- `/api/cron/publish-scheduler` (every minute) — flips scheduled subdomains live/down
+- `/api/cron/monitor-checks` (every 5 min) — runs due uptime/SSL checks
 
-4. Deploy
+Both are guarded by `CRON_SECRET`.
 
-### 3. Google OAuth Setup
-
-In Google Cloud Console → Credentials, add redirect URIs:
-```
-https://app.yourdomain.com/api/auth/callback/google
-http://localhost:3000/api/auth/callback/google
-```
-
-## Usage
-
-### Creating Subdomains
-
-1. Login with Google
-2. Click "Create Subdomain"
-3. Fill in subdomain details
-4. Your subdomain is live at `https://yourname.app.yourdomain.com`
-
-### Link Shortener
-
-1. Navigate to "Link Shortener"
-2. Create short links with custom slugs
-3. Access via `https://url.app.yourdomain.com/[slug]`
-4. Track clicks in real-time
-
-### Domain Management
-
-1. Go to "Domain Manager"
-2. View domain info and expiry
-3. Add/edit/delete DNS records
-4. Manage nameservers
-
-## Tech Stack
-
-- Frontend: Next.js 14, React, TypeScript
-- Styling: CSS Modules
-- Backend: Next.js API Routes
-- Database: MongoDB
-- Authentication: JWT + Google OAuth
-- DNS: NameSilo API
-- Analytics: Recharts
-- Maps: react-simple-maps
-- Icons: Lucide React
-
-## Project Structure
+## Architecture
 
 ```
 src/
 ├── app/
-│   ├── api/              # API routes
-│   ├── subdomain/        # Subdomain pages
-│   ├── url/              # Link shortener redirects
-│   └── page.tsx          # Main app
-├── components/           # React components
-├── lib/                  # Utilities & database
-└── middleware.ts         # Subdomain routing
+│   ├── (dashboard)/     # authed dashboard pages
+│   ├── api/             # route handlers (auth, subdomains, links, analytics,
+│   │                    #   orgs, monitors, submissions, cron, …)
+│   ├── subdomain/[…]    # public SSR subdomain pages
+│   ├── bio/[username]   # public link-in-bio pages
+│   └── url/[slug]       # short-link redirect + password gate
+├── components/          # UI (subdomains, analytics, links, monitors, …)
+├── hooks/               # data hooks (useSubdomains, useOrg, useMonitors, …)
+├── lib/                 # server libs (auth, mongodb, analytics, monitor, …)
+├── helpers/ · types/ · styles/
+└── middleware.ts        # *.ROOT_DOMAIN routing + reserved (bio/url) subdomains
 ```
 
-## API Endpoints
-
-- `POST /api/subdomains` - Create subdomain
-- `GET /api/subdomains` - List subdomains
-- `PUT /api/subdomains/[subdomain]` - Update subdomain
-- `DELETE /api/subdomains/[subdomain]` - Delete subdomain
-- `GET/POST /api/dns/namesilo` - Manage DNS records
-- `GET /api/domain/info` - Get domain information
-- `GET/POST /api/links` - Manage short links
-- `GET /api/links/redirect/[slug]` - Handle redirects
-- `POST /api/analytics/track` - Track page views
-
-## Development
-
-```bash
-# Run dev server
-npm run dev
-
-# Build production
-npm run build
-
-# Start production server
-npm start
-
-# Lint
-npm run lint
-```
-
-## Subdomain Rendering (SSR & SEO)
-
-Public subdomain pages are server-rendered. `src/app/subdomain/[subdomain]/page.tsx`
-is an async server component that reads the subdomain via `getSubdomainBySlug`
-(React `cache()`-deduped) and renders HTML on the server — no client loading
-spinner, and crawlers see full markup.
-
-`generateMetadata()` emits per-subdomain `<head>` tags via
-`buildSubdomainMetadata` ([src/helpers/metadata.ts](src/helpers/metadata.ts)):
-
-- `title`, `description`, canonical URL (`https://{slug}.{NEXT_PUBLIC_ROOT_DOMAIN}`)
-- OpenGraph + Twitter cards
-- `robots: noindex` for inactive subdomains or when `metadata.noindex` is set
-
-Optional SEO fields live inside the subdomain `metadata` object:
-
-| Field | Purpose |
-|-------|---------|
-| `ogImage` | Social share image URL |
-| `canonicalUrl` | Override the canonical URL |
-| `noindex` | Ask crawlers not to index the page |
-
-Missing or inactive subdomains call `notFound()` and render the styled
-not-found boundary. Pages use `dynamic = 'force-dynamic'` so edits appear
-immediately. Author HTML is sanitized via `sanitizeHtml` before rendering.
-
-## Support
-
-For issues or questions, please open an issue on GitHub.
+Developer conventions live in [docs/CONVENTIONS.md](docs/CONVENTIONS.md).
