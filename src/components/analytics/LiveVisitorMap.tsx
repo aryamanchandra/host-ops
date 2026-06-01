@@ -14,10 +14,15 @@ export default function LiveVisitorMap({
   pings: LiveVisitorPing[];
   newIds: Set<string>;
 }) {
+  // Cap markers per country so a busy country doesn't stack into a blob.
+  const PER_COUNTRY = 12;
+  const perCountry: Record<string, number> = {};
   const markers = pings
     .map((p, i) => {
       const c = countryCentroid(p.countryCode);
       if (!c) return null;
+      perCountry[p.countryCode] = (perCountry[p.countryCode] || 0) + 1;
+      if (perCountry[p.countryCode] > PER_COUNTRY) return null;
       return {
         id: p.id,
         coords: jitter(c, i + p.id.length),

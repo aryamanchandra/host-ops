@@ -31,8 +31,18 @@ export function useLiveVisitors(token: string, subdomain?: string) {
     };
 
     poll();
-    timer = setInterval(poll, POLL_MS);
-    return () => clearInterval(timer);
+    // Skip polling while the tab is hidden; refresh immediately on return.
+    timer = setInterval(() => {
+      if (!document.hidden) poll();
+    }, POLL_MS);
+    const onVisible = () => {
+      if (!document.hidden) poll();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
   }, [token, subdomain]);
 
   return { data, newIds };
